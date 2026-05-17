@@ -1,0 +1,292 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg:           #0d0d0d;
+    --panel-bg:     #111111;
+    --border:       #232323;
+    --resizer-bg:   #1a1a1a;
+    --resizer-hover:#272727;
+    --text:         #787878;
+    --text-dim:     #404040;
+    --input-bg:     #151515;
+    --input-border: #282828;
+    --btn-bg:       #181818;
+    --btn-hover:    #222222;
+    --header-h:     46px;
+}
+
+html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* ── Header ── */
+#header {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #4a4a4a;
+    user-select: none;
+}
+
+.layout-selector {
+    display: flex;
+    gap: 4px;
+}
+
+.layout-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 32px;
+    height: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.layout-btn:hover {
+    background: var(--btn-hover);
+    color: var(--text);
+}
+
+.layout-btn.active {
+    background: #1d1d1d;
+    border-color: #363636;
+    color: #828282;
+}
+
+#hide-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 17px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: color 0.12s;
+}
+
+#hide-btn:hover { color: var(--text); }
+
+/* ── Viewer ── */
+#viewer {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ── Panel ── */
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--panel-bg);
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-placeholder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+}
+
+.panel-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    user-select: none;
+}
+
+.url-row {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    max-width: 440px;
+}
+
+.url-input {
+    flex: 1;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text);
+    padding: 8px 11px;
+    border-radius: 4px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+}
+
+.url-input:focus { border-color: #383838; }
+.url-input::placeholder { color: var(--text-dim); }
+.url-input.error { border-color: #5c2a2a; }
+
+.load-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: background 0.12s;
+    flex-shrink: 0;
+}
+
+.load-btn:hover { background: var(--btn-hover); }
+
+.url-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    user-select: none;
+}
+
+/* ── Video ── */
+.panel-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Panel overlay controls */
+.panel-overlay {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.18s;
+    z-index: 5;
+}
+
+.panel:hover .panel-overlay { opacity: 1; }
+
+.overlay-btn {
+    background: rgba(0, 0, 0, 0.72);
+    border: 1px solid #2e2e2e;
+    color: #7a7a7a;
+    padding: 4px 9px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: color 0.12s;
+}
+
+.overlay-btn:hover { color: #c0c0c0; }
+
+/* ── Resizers ── */
+.resizer {
+    background: var(--resizer-bg);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    transition: background 0.12s;
+    touch-action: none;
+}
+
+.resizer:hover,
+.resizer.dragging { background: var(--resizer-hover); }
+
+.resizer.h-res {
+    width: 4px;
+    cursor: col-resize;
+}
+
+.resizer.v-res {
+    height: 4px;
+    cursor: row-resize;
+}
+
+/* Drag handle grip dots */
+.resizer::after {
+    content: '';
+    position: absolute;
+    background: #2e2e2e;
+    border-radius: 2px;
+}
+
+.resizer.h-res::after {
+    width: 2px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.resizer.v-res::after {
+    height: 2px;
+    width: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ── Column wrapper (3 & 4 layouts) ── */
+.panel-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* ── Mobile ── */
+@media (max-width: 700px) {
+    #viewer { flex-direction: column; }
+
+    .panel-col { flex-direction: column; }
+
+    /* On mobile all resizers become row-resize */
+    .resizer.h-res {
+        width: 100%;
+        height: 4px;
+        cursor: row-resize;
+    }
+
+    .resizer.h-res::after {
+        width: 20px;
+        height: 2px;
+    }
+
+    .logo { display: none; }
+}
