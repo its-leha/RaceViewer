@@ -430,6 +430,108 @@ html, body {
     background: #0e0e0e;
 }
 
+/* ── Dock calendar button ── */
+#dock-cal-btn {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 0;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+#dock-cal-btn img {
+    width: 13px;
+    height: 13px;
+    opacity: 0.45;
+    transition: opacity 0.12s;
+}
+
+#dock-cal-btn:hover { background: var(--btn-hover); border-color: var(--border); }
+#dock-cal-btn:hover img { opacity: 0.9; }
+#dock-cal-btn.active { background: var(--btn-hover); border-color: #383838; }
+#dock-cal-btn.active img { opacity: 0.9; }
+
+/* ── Calendar panel ── */
+#calendar-panel {
+    display: none;
+    flex: 1;
+    overflow-y: auto;
+}
+
+#calendar-panel.active { display: block; }
+
+.cal-round {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.cal-round.cal-past { opacity: 0.32; }
+
+.cal-round.cal-next {
+    border-left: 2px solid #404040;
+    padding-left: 10px;
+}
+
+.cal-round-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.cal-round-num {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    padding-top: 2px;
+    flex-shrink: 0;
+}
+
+.cal-location {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c0c0c0;
+}
+
+.cal-name {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 1px;
+}
+
+.cal-sessions { display: flex; flex-direction: column; gap: 1px; }
+
+.cal-session {
+    display: grid;
+    grid-template-columns: 54px 1fr auto;
+    gap: 4px;
+    padding: 1px 0;
+}
+
+.cal-sess-name {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.cal-sess-date { font-size: 10px; color: var(--text); }
+
+.cal-sess-time {
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+}
+
 /* ── Mobile ── */
 @media (max-width: 700px) {
     #viewer { flex-direction: column; }

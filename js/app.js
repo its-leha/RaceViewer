@@ -326,6 +326,96 @@ function buildLayout(n) {
     }
 }
 
+// ── Calendar ───────────────────────────────────────────────────────────────
+
+const JOLPICA = 'https://api.jolpi.ca/ergast/f1';
+
+let _calData = null;
+let _calFetched = false;
+
+async function fetchCalendar() {
+    if (_calFetched) return _calData;
+    _calFetched = true;
+    try {
+        const year = new Date().getFullYear();
+        const r = await fetch(`${JOLPICA}/${year}.json?limit=100`);
+        if (!r.ok) throw new Error(r.status);
+        const json = await r.json();
+        _calData = json.MRData?.RaceTable?.Races ?? null;
+    } catch (_) { _calData = null; }
+    return _calData;
+}
+
+function calSessionDateTime(dateStr, timeStr) {
+    if (!dateStr) return null;
+    return new Date(dateStr + 'T' + (timeStr || '00:00:00Z'));
+}
+
+function buildCalSessions(race) {
+    const rows = [];
+    function add(label, dateStr, timeStr) {
+        const d = calSessionDateTime(dateStr, timeStr);
+        if (!d || isNaN(d)) return;
+        rows.push({ label, d });
+    }
+    add('FP1',      race.FirstPractice?.date,      race.FirstPractice?.time);
+    add('FP2',      race.SecondPractice?.date,      race.SecondPractice?.time);
+    add('FP3',      race.ThirdPractice?.date,       race.ThirdPractice?.time);
+    add('Sprint Q', race.SprintQualifying?.date,    race.SprintQualifying?.time);
+    add('Спринт',   race.Sprint?.date,              race.Sprint?.time);
+    add('Квали',    race.Qualifying?.date,          race.Qualifying?.time);
+    add('Гонка',    race.date,                      race.time);
+    rows.sort((a, b) => a.d - b.d);
+    return rows.map(({ label, d }) => ({
+        label,
+        date: d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }),
+        time: d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+    }));
+}
+
+function renderCalendar(races) {
+    const panel = document.getElementById('calendar-panel');
+    if (!races?.length) {
+        panel.innerHTML = '<div style="padding:20px 16px;color:#404040;font-size:12px;text-align:center">Расписание недоступно</div>';
+        return;
+    }
+    const now = new Date();
+    let nextIndex = -1;
+
+    const html = races.map((race, i) => {
+        const raceDate = calSessionDateTime(race.date, race.time);
+        const isPast = raceDate && raceDate < now;
+        if (!isPast && nextIndex === -1) nextIndex = i;
+
+        const sessions = buildCalSessions(race);
+        return `
+        <div class="cal-round${isPast ? ' cal-past' : ''}${i === nextIndex ? ' cal-next' : ''}">
+            <div class="cal-round-header">
+                <span class="cal-round-num">R${race.round}</span>
+                <div>
+                    <div class="cal-location">${race.Circuit.Location.locality}, ${race.Circuit.Location.country}</div>
+                    <div class="cal-name">${race.raceName}</div>
+                </div>
+            </div>
+            <div class="cal-sessions">
+                ${sessions.map(s => `
+                <div class="cal-session">
+                    <span class="cal-sess-name">${s.label}</span>
+                    <span class="cal-sess-date">${s.date}</span>
+                    <span class="cal-sess-time">${s.time}</span>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    }).join('');
+
+    panel.innerHTML = html;
+
+    if (nextIndex >= 0) {
+        const nextEl = panel.querySelector('.cal-next');
+        if (nextEl) setTimeout(() => nextEl.scrollIntoView({ block: 'start', behavior: 'instant' }), 0);
+    }
+}
+
 // ── Dock ──────────────────────────────────────────────────────────────────
 
 function initDock() {
@@ -335,6 +425,12 @@ function initDock() {
     const frame      = document.getElementById('dock-frame');
     const urlInput   = document.getElementById('dock-url-input');
     const goBtn      = document.getElementById('dock-go');
+    const calBtn     = document.getElementById('dock-cal-btn');
+    const calPanel   = document.getElementById('calendar-panel');
+    const urlRow     = document.querySelector('.dock-input-row');
+
+    let calMode = false;
+    let calLoaded = false;
 
     function toggleDock() {
         const open = dock.classList.toggle('active');
@@ -342,14 +438,44 @@ function initDock() {
         dockBtn.classList.toggle('active', open);
     }
 
+    function exitCalMode() {
+        calMode = false;
+        calBtn.classList.remove('active');
+        calPanel.classList.remove('active');
+        frame.style.display = '';
+        urlRow.style.display = '';
+    }
+
+    async function openCalMode() {
+        calMode = true;
+        calBtn.classList.add('active');
+        frame.style.display = 'none';
+        urlRow.style.display = 'none';
+        calPanel.classList.add('active');
+        document.querySelectorAll('.dock-preset').forEach(b => b.classList.remove('active'));
+
+        if (!calLoaded) {
+            calPanel.innerHTML = '<div style="padding:20px 16px;color:#404040;font-size:12px;text-align:center">Загрузка...</div>';
+            const races = await fetchCalendar();
+            renderCalendar(races);
+            calLoaded = true;
+        }
+    }
+
     function loadUrl(url) {
         if (!url) return;
+        if (calMode) exitCalMode();
         if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
         frame.src = url;
         urlInput.value = url;
         document.querySelectorAll('.dock-preset').forEach(b =>
             b.classList.toggle('active', b.dataset.url === url));
     }
+
+    calBtn.addEventListener('click', () => {
+        if (!dock.classList.contains('active')) toggleDock();
+        if (calMode) exitCalMode(); else openCalMode();
+    });
 
     dockBtn.addEventListener('click', toggleDock);
     goBtn.addEventListener('click', () => loadUrl(urlInput.value.trim()));

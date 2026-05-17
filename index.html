@@ -27,6 +27,9 @@
                 <div id="dock-bar">
                     <div id="dock-presets">
                         <button class="dock-preset" data-url="https://app.f1livepulse.com/live-timing">F1 Телеметрия</button>
+                        <button id="dock-cal-btn" title="Календарь гонок">
+                            <img src="src/icon/date.svg" alt="">
+                        </button>
                     </div>
                     <div class="dock-input-row">
                         <input id="dock-url-input" type="text" placeholder="URL сайта" autocomplete="off" spellcheck="false">
@@ -34,6 +37,7 @@
                     </div>
                 </div>
                 <iframe id="dock-frame" src="about:blank" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div id="calendar-panel"></div>
             </aside>
         </div>
     </div>
