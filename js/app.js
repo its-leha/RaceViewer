@@ -146,6 +146,15 @@ function renderVideo(el, id, url) {
         updateViewerClass();
     });
 
+    // iframe перехватывает mousemove — при входе на видео-панель
+    // ставим позицию в её центр, чтобы пустые панели корректно гасли
+    el.addEventListener('mouseenter', () => {
+        const rect = el.getBoundingClientRect();
+        mouseX = rect.left + rect.width / 2;
+        mouseY = rect.top  + rect.height / 2;
+        scheduleProximity();
+    });
+
     updateViewerClass();
 }
 
