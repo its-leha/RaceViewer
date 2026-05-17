@@ -48,7 +48,8 @@ function parseYouTube(url) {
 function parseVK(url) {
     try {
         const u = new URL(url);
-        if (!u.hostname.includes('vk.com') && !u.hostname.includes('vk.ru')) return null;
+        const host = u.hostname;
+        if (!host.includes('vk.com') && !host.includes('vk.ru') && !host.includes('vkvideo.ru')) return null;
 
         let raw = null;
 
@@ -146,58 +147,14 @@ function renderVideo(el, id, url) {
         updateViewerClass();
     });
 
-    // iframe перехватывает mousemove — при входе на видео-панель
-    // ставим позицию в её центр, чтобы пустые панели корректно гасли
-    el.addEventListener('mouseenter', () => {
-        const rect = el.getBoundingClientRect();
-        mouseX = rect.left + rect.width / 2;
-        mouseY = rect.top  + rect.height / 2;
-        scheduleProximity();
-    });
-
     updateViewerClass();
 }
 
-// ── Dimming & proximity ────────────────────────────────────────────────────
+// ── Dimming ────────────────────────────────────────────────────────────────
 
 function updateViewerClass() {
     const hasVideo = Object.keys(state.videos).length > 0;
     document.getElementById('viewer').classList.toggle('has-video', hasVideo);
-    if (!hasVideo) {
-        document.querySelectorAll('.panel-placeholder').forEach(ph => {
-            ph.style.opacity = '';
-            ph.classList.remove('lit');
-        });
-    }
-}
-
-const PROXIMITY_RADIUS = 140;
-const DIM_OPACITY      = 0.07;
-const BRIGHT_OPACITY   = 1.0;
-
-let mouseX = -9999, mouseY = -9999, rafId = null;
-
-function applyProximity() {
-    rafId = null;
-    const viewer = document.getElementById('viewer');
-    if (!viewer.classList.contains('has-video')) return;
-
-    viewer.querySelectorAll('.panel-placeholder').forEach(ph => {
-        const rect = ph.getBoundingClientRect();
-        const dx   = Math.max(rect.left - mouseX, 0, mouseX - rect.right);
-        const dy   = Math.max(rect.top  - mouseY, 0, mouseY - rect.bottom);
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        const t   = Math.max(0, 1 - dist / PROXIMITY_RADIUS);
-        const opacity = DIM_OPACITY + (BRIGHT_OPACITY - DIM_OPACITY) * t;
-
-        ph.style.opacity = opacity;
-        ph.classList.toggle('lit', t > 0.05);
-    });
-}
-
-function scheduleProximity() {
-    if (!rafId) rafId = requestAnimationFrame(applyProximity);
 }
 
 // ── Resizer ────────────────────────────────────────────────────────────────
@@ -354,18 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && !headerVisible) toggleHeader();
         if (e.ctrlKey && e.key === 'h') { e.preventDefault(); toggleHeader(); }
-    });
-
-    document.addEventListener('mousemove', e => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        scheduleProximity();
-    });
-
-    document.addEventListener('mouseleave', () => {
-        mouseX = -9999;
-        mouseY = -9999;
-        scheduleProximity();
     });
 
     buildLayout(state.layout);
