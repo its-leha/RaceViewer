@@ -374,9 +374,9 @@ function buildCalSessions(race) {
 }
 
 function renderCalendar(races) {
-    const panel = document.getElementById('calendar-panel');
+    const grid = document.getElementById('cal-grid');
     if (!races?.length) {
-        panel.innerHTML = '<div style="padding:20px 16px;color:#404040;font-size:12px;text-align:center">Расписание недоступно</div>';
+        grid.innerHTML = '<div style="padding:16px 20px;color:#404040;font-size:12px;">Расписание недоступно</div>';
         return;
     }
     const now = new Date();
@@ -408,29 +408,23 @@ function renderCalendar(races) {
         </div>`;
     }).join('');
 
-    panel.innerHTML = html;
+    grid.innerHTML = html;
 
     if (nextIndex >= 0) {
-        const nextEl = panel.querySelector('.cal-next');
-        if (nextEl) setTimeout(() => nextEl.scrollIntoView({ block: 'start', behavior: 'instant' }), 0);
+        const nextEl = grid.querySelector('.cal-next');
+        if (nextEl) setTimeout(() => nextEl.scrollIntoView({ inline: 'start', behavior: 'instant' }), 0);
     }
 }
 
 // ── Dock ──────────────────────────────────────────────────────────────────
 
 function initDock() {
-    const dock       = document.getElementById('dock');
-    const dockRes    = document.getElementById('dock-resizer');
-    const dockBtn    = document.getElementById('dock-btn');
-    const frame      = document.getElementById('dock-frame');
-    const urlInput   = document.getElementById('dock-url-input');
-    const goBtn      = document.getElementById('dock-go');
-    const calBtn     = document.getElementById('dock-cal-btn');
-    const calPanel   = document.getElementById('calendar-panel');
-    const urlRow     = document.querySelector('.dock-input-row');
-
-    let calMode = false;
-    let calLoaded = false;
+    const dock     = document.getElementById('dock');
+    const dockRes  = document.getElementById('dock-resizer');
+    const dockBtn  = document.getElementById('dock-btn');
+    const frame    = document.getElementById('dock-frame');
+    const urlInput = document.getElementById('dock-url-input');
+    const goBtn    = document.getElementById('dock-go');
 
     function toggleDock() {
         const open = dock.classList.toggle('active');
@@ -438,44 +432,14 @@ function initDock() {
         dockBtn.classList.toggle('active', open);
     }
 
-    function exitCalMode() {
-        calMode = false;
-        calBtn.classList.remove('active');
-        calPanel.classList.remove('active');
-        frame.style.display = '';
-        urlRow.style.display = '';
-    }
-
-    async function openCalMode() {
-        calMode = true;
-        calBtn.classList.add('active');
-        frame.style.display = 'none';
-        urlRow.style.display = 'none';
-        calPanel.classList.add('active');
-        document.querySelectorAll('.dock-preset').forEach(b => b.classList.remove('active'));
-
-        if (!calLoaded) {
-            calPanel.innerHTML = '<div style="padding:20px 16px;color:#404040;font-size:12px;text-align:center">Загрузка...</div>';
-            const races = await fetchCalendar();
-            renderCalendar(races);
-            calLoaded = true;
-        }
-    }
-
     function loadUrl(url) {
         if (!url) return;
-        if (calMode) exitCalMode();
         if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
         frame.src = url;
         urlInput.value = url;
         document.querySelectorAll('.dock-preset').forEach(b =>
             b.classList.toggle('active', b.dataset.url === url));
     }
-
-    calBtn.addEventListener('click', () => {
-        if (!dock.classList.contains('active')) toggleDock();
-        if (calMode) exitCalMode(); else openCalMode();
-    });
 
     dockBtn.addEventListener('click', toggleDock);
     goBtn.addEventListener('click', () => loadUrl(urlInput.value.trim()));
@@ -511,6 +475,27 @@ function initDock() {
         }
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onEnd);
+    });
+}
+
+// ── Calendar header ───────────────────────────────────────────────────────
+
+function initCalHeader() {
+    const calBtn = document.getElementById('cal-btn');
+    const calBar = document.getElementById('calendar-bar');
+    let calLoaded = false;
+
+    calBtn.addEventListener('click', async () => {
+        const active = calBar.classList.toggle('active');
+        calBtn.classList.toggle('active', active);
+
+        if (active && !calLoaded) {
+            document.getElementById('cal-grid').innerHTML =
+                '<div style="padding:16px 20px;color:#404040;font-size:12px;">Загрузка...</div>';
+            const races = await fetchCalendar();
+            renderCalendar(races);
+            calLoaded = true;
+        }
     });
 }
 
@@ -551,4 +536,5 @@ document.addEventListener('DOMContentLoaded', () => {
     buildLayout(state.layout);
     updateViewerClass();
     initDock();
+    initCalHeader();
 });
