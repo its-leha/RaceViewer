@@ -218,8 +218,8 @@ html, body {
 }
 
 .telemetry-btn img {
-    width: 18px;
-    height: 18px;
+    width: 27px;
+    height: 27px;
     opacity: 0.6;
     transition: opacity 0.12s;
 }
