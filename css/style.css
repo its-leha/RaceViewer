@@ -649,25 +649,23 @@ html, body {
 
 .about-channels {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-direction: column;
+    gap: 5px;
     margin-top: 8px;
 }
 
-.about-channels a {
+.about-channels span {
     font-size: 11px;
     color: var(--text-dim);
-    text-decoration: none;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 2px 8px;
-    transition: color 0.12s, border-color 0.12s;
 }
 
-.about-channels a:hover {
+.about-channels a {
     color: var(--text);
-    border-color: #383838;
+    text-decoration: none;
+    transition: color 0.12s;
 }
+
+.about-channels a:hover { color: #d0d0d0; }
 
 .cal-round {
     padding: 10px 12px;
