@@ -519,20 +519,35 @@ function renderCalendar(races) {
     }
 }
 
-// ── Calendar sidebar ──────────────────────────────────────────────────────
+// ── Sidebar (calendar + about) ────────────────────────────────────────────
 
 function initCalHeader() {
-    const calBtn = document.getElementById('cal-btn');
-    const calPanel = document.getElementById('dock');
-    const calRes  = document.getElementById('dock-resizer');
-    let calLoaded = false;
+    const calBtn   = document.getElementById('cal-btn');
+    const aboutBtn = document.getElementById('about-btn');
+    const panel    = document.getElementById('dock');
+    const panelRes = document.getElementById('dock-resizer');
+    const calSec   = document.getElementById('cal-section');
+    const aboutSec = document.getElementById('about-section');
+    let calLoaded  = false;
+    let activeSection = null;
+
+    function openSection(name) {
+        const same = activeSection === name;
+        activeSection = same ? null : name;
+
+        const open = !!activeSection;
+        panel.classList.toggle('active', open);
+        panelRes.classList.toggle('active', open);
+
+        calSec.classList.toggle('active', activeSection === 'cal');
+        aboutSec.classList.toggle('active', activeSection === 'about');
+        calBtn.classList.toggle('active', activeSection === 'cal');
+        aboutBtn.classList.toggle('active', activeSection === 'about');
+    }
 
     calBtn.addEventListener('click', async () => {
-        const active = calPanel.classList.toggle('active');
-        calRes.classList.toggle('active', active);
-        calBtn.classList.toggle('active', active);
-
-        if (active && !calLoaded) {
+        openSection('cal');
+        if (activeSection === 'cal' && !calLoaded) {
             document.getElementById('cal-grid').innerHTML =
                 '<div style="padding:16px 12px;color:#404040;font-size:12px;">Загрузка...</div>';
             const races = await fetchCalendar();
@@ -541,22 +556,24 @@ function initCalHeader() {
         }
     });
 
+    aboutBtn.addEventListener('click', () => openSection('about'));
+
     // Resizer — drag left edge to resize panel width
     let startX, startW;
-    calRes.addEventListener('mousedown', e => {
+    panelRes.addEventListener('mousedown', e => {
         startX = e.clientX;
-        startW = calPanel.offsetWidth;
-        calRes.classList.add('dragging');
+        startW = panel.offsetWidth;
+        panelRes.classList.add('dragging');
         document.body.style.cursor = 'col-resize';
         document.body.style.userSelect = 'none';
         document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = 'none');
 
         function onMove(e) {
             const delta = startX - e.clientX;
-            calPanel.style.width = Math.max(220, Math.min(700, startW + delta)) + 'px';
+            panel.style.width = Math.max(220, Math.min(700, startW + delta)) + 'px';
         }
         function onEnd() {
-            calRes.classList.remove('dragging');
+            panelRes.classList.remove('dragging');
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
             document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');

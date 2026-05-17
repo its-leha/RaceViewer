@@ -16,6 +16,10 @@
                 <button class="layout-btn" data-layout="4">4</button>
             </div>
             <div class="header-right">
+                <button id="about-btn" title="О сервисе">
+                    <span class="about-icon">i</span>
+                    О сервисе
+                </button>
                 <button id="cal-btn" title="Расписание гонок">
                     <img src="src/icon/date.svg" alt="">
                 </button>
@@ -26,8 +30,35 @@
             <main id="viewer"></main>
             <div id="dock-resizer" class="resizer h-res"></div>
             <aside id="dock">
-                <div id="cal-sidebar-head">Расписание</div>
-                <div id="cal-grid"></div>
+                <div id="cal-section">
+                    <div id="cal-sidebar-head">Расписание</div>
+                    <div id="cal-grid"></div>
+                </div>
+                <div id="about-section">
+                    <div class="sidebar-head">О сервисе</div>
+                    <div id="about-body">
+                        <div class="about-project">RaceViewer</div>
+                        <p>Некоммерческий проект, сделанный друзьями для друзей — для тех, кто хочет смотреть гонки удобно, не переключаясь между десятками вкладок.</p>
+                        <p>Открывай 2, 3 или 4 трансляции одновременно в одном окне. Вставь ссылку — и смотри.</p>
+                        <div class="about-section-title">Поддерживаемые платформы</div>
+                        <ul class="about-list">
+                            <li>YouTube и YouTube Live</li>
+                            <li>VK Video и VK Спорт</li>
+                            <li>Rutube</li>
+                        </ul>
+                        <div class="about-section-title">Встроено</div>
+                        <ul class="about-list">
+                            <li>RacePulse — телеметрия F1 онлайн</li>
+                            <li>Расписание этапов сезона</li>
+                            <li>Предложения видео с канала гонок</li>
+                        </ul>
+                        <div class="about-notice">Проект полностью бесплатный, без рекламы и регистрации. Не монетизируется и не собирает данные. Предоставляется «как есть», без каких-либо гарантий.</div>
+                        <div class="about-footer">
+                            <span>Создан в 2026 году</span>
+                            <a href="https://t.me/hi_itsleha" target="_blank" rel="noopener noreferrer">Telegram →</a>
+                        </div>
+                    </div>
+                </div>
             </aside>
         </div>
     </div>
