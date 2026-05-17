@@ -87,17 +87,43 @@ function toEmbedUrl(url) {
 
 // ── Panel factory ──────────────────────────────────────────────────────────
 
+const TELEMETRY_MARKER = '__telemetry__';
+const RACEPULSE_URL    = 'https://its-leha.github.io/RacePulse';
+
 function makePanel(id) {
     const el = document.createElement('div');
     el.className = 'panel';
     el.dataset.id = id;
 
-    if (state.videos[id]) {
+    if (state.videos[id] === TELEMETRY_MARKER) {
+        renderTelemetry(el, id);
+    } else if (state.videos[id]) {
         renderVideo(el, id, state.videos[id]);
     } else {
         renderPlaceholder(el, id);
     }
     return el;
+}
+
+function renderTelemetry(el, id) {
+    el.innerHTML = `
+        <iframe class="panel-video" src="${RACEPULSE_URL}"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <div class="panel-overlay">
+            <button class="overlay-btn" data-action="clear">Изменить</button>
+        </div>`;
+
+    el.querySelector('[data-action="clear"]').addEventListener('click', () => {
+        delete state.videos[id];
+        persist();
+        renderPlaceholder(el, id);
+        updateViewerClass();
+    });
+
+    updateViewerClass();
 }
 
 function renderPlaceholder(el, id) {
@@ -110,7 +136,12 @@ function renderPlaceholder(el, id) {
                     autocomplete="off" spellcheck="false">
                 <button class="load-btn">Загрузить</button>
             </div>
-            <span class="url-hint">youtube.com · youtu.be · vk.com/video</span>
+            <span class="url-hint">youtube.com · youtu.be · vk.com/video · rutube.ru</span>
+            <span class="or-sep">или</span>
+            <button class="telemetry-btn">
+                <img src="src/icon/RacePulse.svg" alt="">
+                RacePulse телеметрия
+            </button>
         </div>`;
 
     const input = el.querySelector('.url-input');
@@ -136,6 +167,12 @@ function renderPlaceholder(el, id) {
     input.addEventListener('paste', () => setTimeout(() => {
         if (toEmbedUrl(input.value.trim())) tryLoad();
     }, 40));
+
+    el.querySelector('.telemetry-btn').addEventListener('click', () => {
+        state.videos[id] = TELEMETRY_MARKER;
+        persist();
+        renderTelemetry(el, id);
+    });
 }
 
 function renderVideo(el, id, url) {

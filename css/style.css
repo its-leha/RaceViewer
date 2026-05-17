@@ -196,6 +196,41 @@ html, body {
     user-select: none;
 }
 
+.or-sep {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    user-select: none;
+}
+
+.telemetry-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.telemetry-btn img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.6;
+    transition: opacity 0.12s;
+}
+
+.telemetry-btn:hover {
+    background: var(--btn-hover);
+    border-color: #383838;
+}
+
+.telemetry-btn:hover img { opacity: 1; }
+
 /* ── Opacity states ── */
 .panel-placeholder {
     opacity: 1;             /* no video: full brightness */
