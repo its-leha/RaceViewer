@@ -128,7 +128,7 @@ html, body {
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-dim);
+    color: #686868;
     user-select: none;
 }
 
@@ -152,8 +152,8 @@ html, body {
     min-width: 0;
 }
 
-.url-input:focus { border-color: #383838; }
-.url-input::placeholder { color: var(--text-dim); }
+.url-input:focus { border-color: #484848; }
+.url-input::placeholder { color: #565656; }
 .url-input.error { border-color: #5c2a2a; }
 
 .load-btn {
@@ -173,8 +173,20 @@ html, body {
 
 .url-hint {
     font-size: 11px;
-    color: var(--text-dim);
+    color: #545454;
     user-select: none;
+}
+
+/* ── Dimming when any video is loaded ── */
+.has-video .panel-placeholder {
+    opacity: 0.18;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+}
+
+/* Re-enable interaction when proximity JS raises opacity */
+.has-video .panel-placeholder.lit {
+    pointer-events: auto;
 }
 
 /* ── Video ── */

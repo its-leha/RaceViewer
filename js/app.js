@@ -117,6 +117,7 @@ function renderPlaceholder(el, id) {
         state.videos[id] = url;
         persist();
         renderVideo(el, id, url);
+        updateViewerClass();
     }
 
     btn.addEventListener('click', tryLoad);
@@ -142,7 +143,46 @@ function renderVideo(el, id, url) {
         delete state.videos[id];
         persist();
         renderPlaceholder(el, id);
+        updateViewerClass();
     });
+
+    updateViewerClass();
+}
+
+// ── Dimming & proximity ────────────────────────────────────────────────────
+
+function updateViewerClass() {
+    const hasVideo = Object.keys(state.videos).length > 0;
+    document.getElementById('viewer').classList.toggle('has-video', hasVideo);
+}
+
+const PROXIMITY_RADIUS = 260;
+const DIM_OPACITY      = 0.18;
+const BRIGHT_OPACITY   = 0.92;
+
+let mouseX = -9999, mouseY = -9999, rafId = null;
+
+function applyProximity() {
+    rafId = null;
+    const viewer = document.getElementById('viewer');
+    if (!viewer.classList.contains('has-video')) return;
+
+    viewer.querySelectorAll('.panel-placeholder').forEach(ph => {
+        const rect = ph.getBoundingClientRect();
+        const dx   = Math.max(rect.left - mouseX, 0, mouseX - rect.right);
+        const dy   = Math.max(rect.top  - mouseY, 0, mouseY - rect.bottom);
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        const t   = Math.max(0, 1 - dist / PROXIMITY_RADIUS);
+        const opacity = DIM_OPACITY + (BRIGHT_OPACITY - DIM_OPACITY) * t;
+
+        ph.style.opacity = opacity;
+        ph.classList.toggle('lit', t > 0.05);
+    });
+}
+
+function scheduleProximity() {
+    if (!rafId) rafId = requestAnimationFrame(applyProximity);
 }
 
 // ── Resizer ────────────────────────────────────────────────────────────────
@@ -301,5 +341,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.ctrlKey && e.key === 'h') { e.preventDefault(); toggleHeader(); }
     });
 
+    document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        scheduleProximity();
+    });
+
+    document.addEventListener('mouseleave', () => {
+        mouseX = -9999;
+        mouseY = -9999;
+        scheduleProximity();
+    });
+
     buildLayout(state.layout);
+    updateViewerClass();
 });
