@@ -97,7 +97,7 @@ async function fetchSuggestions() {
     if (_suggFetched) return _suggData;
     _suggFetched = true;
     try {
-        const r = await fetch(`${CF_WORKER}/rutube/video/?channel_id=${RUTUBE_CHANNEL}&ordering=-created_at&page_size=8`);
+        const r = await fetch(`${CF_WORKER}/rutube/video/person/${RUTUBE_CHANNEL}/?ordering=-created_at&page_size=8`);
         if (!r.ok) throw new Error(r.status);
         const json = await r.json();
         _suggData = json.results ?? null;
@@ -147,12 +147,12 @@ function renderSuggestions(el, id) {
             return;
         }
 
-        const sorted = [...videos].sort((a, b) => (b.is_live ? 1 : 0) - (a.is_live ? 1 : 0));
+        const sorted = [...videos].sort((a, b) => (b.is_on_air ? 1 : 0) - (a.is_on_air ? 1 : 0));
 
         grid.innerHTML = sorted.map(v => {
             const videoUrl = rutubeVideoUrl(v);
             if (!videoUrl) return '';
-            const isLive = !!v.is_live;
+            const isLive = !!v.is_on_air;
             const dur    = isLive ? '' : formatDuration(v.duration);
             return `
             <div class="sugg-card" data-url="${escHtml(videoUrl)}">
