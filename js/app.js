@@ -85,6 +85,101 @@ function toEmbedUrl(url) {
     return parseYouTube(url) || parseVK(url) || parseRutube(url) || null;
 }
 
+// ── Suggestions ────────────────────────────────────────────────────────────
+
+const CF_WORKER      = 'https://gentle-fire-7fad.hi-itsleha.workers.dev';
+const RUTUBE_CHANNEL = '35504962';
+
+let _suggData    = null;
+let _suggFetched = false;
+
+async function fetchSuggestions() {
+    if (_suggFetched) return _suggData;
+    _suggFetched = true;
+    try {
+        const r = await fetch(`${CF_WORKER}/rutube/video/?channel_id=${RUTUBE_CHANNEL}&ordering=-created_at&page_size=8`);
+        if (!r.ok) throw new Error(r.status);
+        const json = await r.json();
+        _suggData = json.results ?? null;
+    } catch (_) { _suggData = null; }
+    return _suggData;
+}
+
+function formatDuration(sec) {
+    if (!sec) return '';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return h > 0
+        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+        : `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function rutubeVideoUrl(v) {
+    if (v.video_url) return v.video_url;
+    if (typeof v.id === 'string' && /^[a-f0-9]{32}$/.test(v.id))
+        return `https://rutube.ru/video/${v.id}/`;
+    return null;
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderSuggestions(el, id) {
+    el.innerHTML = `
+        <div class="panel-placeholder panel-suggestions">
+            <div class="sugg-topbar">
+                <button class="sugg-back">←</button>
+                <span class="panel-label">Предложения</span>
+            </div>
+            <div class="sugg-grid">
+                <div class="sugg-msg">Загрузка…</div>
+            </div>
+        </div>`;
+
+    el.querySelector('.sugg-back').addEventListener('click', () => renderPlaceholder(el, id));
+    const grid = el.querySelector('.sugg-grid');
+
+    fetchSuggestions().then(videos => {
+        if (!videos?.length) {
+            grid.innerHTML = '<div class="sugg-msg">Видео недоступны</div>';
+            return;
+        }
+
+        const sorted = [...videos].sort((a, b) => (b.is_live ? 1 : 0) - (a.is_live ? 1 : 0));
+
+        grid.innerHTML = sorted.map(v => {
+            const videoUrl = rutubeVideoUrl(v);
+            if (!videoUrl) return '';
+            const isLive = !!v.is_live;
+            const dur    = isLive ? '' : formatDuration(v.duration);
+            return `
+            <div class="sugg-card" data-url="${escHtml(videoUrl)}">
+                <div class="sugg-thumb">
+                    <img src="${escHtml(v.thumbnail_url || '')}" alt="" loading="lazy">
+                    ${isLive ? '<span class="sugg-live-badge">LIVE</span>' : ''}
+                </div>
+                <div class="sugg-info">
+                    <span class="sugg-card-title">${escHtml(v.title || 'Без названия')}</span>
+                    ${dur ? `<span class="sugg-duration">${dur}</span>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+
+        grid.querySelectorAll('.sugg-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const url = card.dataset.url;
+                if (!toEmbedUrl(url)) return;
+                state.videos[id] = url;
+                persist();
+                renderVideo(el, id, url);
+                updateViewerClass();
+            });
+        });
+    });
+}
+
 // ── Panel factory ──────────────────────────────────────────────────────────
 
 const TELEMETRY_MARKER = '__telemetry__';
@@ -142,6 +237,10 @@ function renderPlaceholder(el, id) {
                 <img src="src/icon/RacePulse.svg" alt="">
                 RacePulse телеметрия
             </button>
+            <button class="suggest-btn">
+                <img src="src/icon/star1.svg" alt="">
+                Предложить гонку
+            </button>
         </div>`;
 
     const input = el.querySelector('.url-input');
@@ -172,6 +271,10 @@ function renderPlaceholder(el, id) {
         state.videos[id] = TELEMETRY_MARKER;
         persist();
         renderTelemetry(el, id);
+    });
+
+    el.querySelector('.suggest-btn').addEventListener('click', () => {
+        renderSuggestions(el, id);
     });
 }
 
