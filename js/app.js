@@ -154,11 +154,17 @@ function renderVideo(el, id, url) {
 function updateViewerClass() {
     const hasVideo = Object.keys(state.videos).length > 0;
     document.getElementById('viewer').classList.toggle('has-video', hasVideo);
+    if (!hasVideo) {
+        document.querySelectorAll('.panel-placeholder').forEach(ph => {
+            ph.style.opacity = '';
+            ph.classList.remove('lit');
+        });
+    }
 }
 
-const PROXIMITY_RADIUS = 260;
-const DIM_OPACITY      = 0.18;
-const BRIGHT_OPACITY   = 0.92;
+const PROXIMITY_RADIUS = 140;
+const DIM_OPACITY      = 0.07;
+const BRIGHT_OPACITY   = 1.0;
 
 let mouseX = -9999, mouseY = -9999, rafId = null;
 

@@ -128,7 +128,7 @@ html, body {
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #686868;
+    color: #d4d4d4;
     user-select: none;
 }
 
@@ -142,8 +142,8 @@ html, body {
 .url-input {
     flex: 1;
     background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    color: var(--text);
+    border: 1px solid #606060;
+    color: #d4d4d4;
     padding: 8px 11px;
     border-radius: 4px;
     font-size: 13px;
@@ -152,14 +152,14 @@ html, body {
     min-width: 0;
 }
 
-.url-input:focus { border-color: #484848; }
-.url-input::placeholder { color: #565656; }
+.url-input:focus { border-color: #909090; }
+.url-input::placeholder { color: #a0a0a0; }
 .url-input.error { border-color: #5c2a2a; }
 
 .load-btn {
     background: var(--btn-bg);
-    border: 1px solid var(--border);
-    color: var(--text);
+    border: 1px solid #606060;
+    color: #d4d4d4;
     padding: 8px 13px;
     border-radius: 4px;
     cursor: pointer;
@@ -173,20 +173,23 @@ html, body {
 
 .url-hint {
     font-size: 11px;
-    color: #545454;
+    color: #a0a0a0;
     user-select: none;
 }
 
-/* ── Dimming when any video is loaded ── */
+/* ── Opacity states ── */
+.panel-placeholder {
+    opacity: 0.5;           /* default: muted look (bright base × 0.5 ≈ current muted) */
+    transition: opacity 0.3s ease;
+}
+
 .has-video .panel-placeholder {
-    opacity: 0.18;
-    transition: opacity 0.35s ease;
+    opacity: 0.07;          /* nearly invisible when video loaded and mouse is far */
     pointer-events: none;
 }
 
-/* Re-enable interaction when proximity JS raises opacity */
 .has-video .panel-placeholder.lit {
-    pointer-events: auto;
+    pointer-events: auto;   /* re-enable interaction when mouse is near */
 }
 
 /* ── Video ── */
