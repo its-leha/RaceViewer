@@ -71,8 +71,18 @@ function parseVK(url) {
     return null;
 }
 
+function parseRutube(url) {
+    try {
+        const u = new URL(url);
+        if (!u.hostname.includes('rutube.ru')) return null;
+        const match = u.pathname.match(/\/video\/([a-f0-9]{32})/);
+        if (match) return `https://rutube.ru/play/embed/${match[1]}`;
+    } catch (_) {}
+    return null;
+}
+
 function toEmbedUrl(url) {
-    return parseYouTube(url) || parseVK(url) || null;
+    return parseYouTube(url) || parseVK(url) || parseRutube(url) || null;
 }
 
 // ── Panel factory ──────────────────────────────────────────────────────────
@@ -279,6 +289,68 @@ function buildLayout(n) {
     }
 }
 
+// ── Dock ──────────────────────────────────────────────────────────────────
+
+function initDock() {
+    const dock       = document.getElementById('dock');
+    const dockRes    = document.getElementById('dock-resizer');
+    const dockBtn    = document.getElementById('dock-btn');
+    const frame      = document.getElementById('dock-frame');
+    const urlInput   = document.getElementById('dock-url-input');
+    const goBtn      = document.getElementById('dock-go');
+
+    function toggleDock() {
+        const open = dock.classList.toggle('active');
+        dockRes.classList.toggle('active', open);
+        dockBtn.classList.toggle('active', open);
+    }
+
+    function loadUrl(url) {
+        if (!url) return;
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+        frame.src = url;
+        urlInput.value = url;
+        document.querySelectorAll('.dock-preset').forEach(b =>
+            b.classList.toggle('active', b.dataset.url === url));
+    }
+
+    dockBtn.addEventListener('click', toggleDock);
+    goBtn.addEventListener('click', () => loadUrl(urlInput.value.trim()));
+    urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadUrl(urlInput.value.trim()); });
+
+    document.querySelectorAll('.dock-preset').forEach(b =>
+        b.addEventListener('click', () => {
+            if (!dock.classList.contains('active')) toggleDock();
+            loadUrl(b.dataset.url);
+        }));
+
+    // Dock resizer — drag left edge to resize
+    let startX, startW;
+    dockRes.addEventListener('mousedown', e => {
+        startX = e.clientX;
+        startW = dock.offsetWidth;
+        dockRes.classList.add('dragging');
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = 'none');
+
+        function onMove(e) {
+            const delta = startX - e.clientX;
+            dock.style.width = Math.max(220, Math.min(900, startW + delta)) + 'px';
+        }
+        function onEnd() {
+            dockRes.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+    });
+}
+
 // ── UI controls ───────────────────────────────────────────────────────────
 
 function setLayout(n) {
@@ -315,4 +387,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buildLayout(state.layout);
     updateViewerClass();
+    initDock();
 });

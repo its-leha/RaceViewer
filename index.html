@@ -15,9 +15,27 @@
                 <button class="layout-btn" data-layout="3">3</button>
                 <button class="layout-btn" data-layout="4">4</button>
             </div>
-            <button id="hide-btn" title="Скрыть интерфейс (Ctrl+H)">&#x2922;</button>
+            <div class="header-right">
+                <button id="dock-btn" title="Виджеты">&#x229E;</button>
+                <button id="hide-btn" title="Скрыть интерфейс (Ctrl+H)">&#x2922;</button>
+            </div>
         </header>
-        <main id="viewer"></main>
+        <div id="main-area">
+            <main id="viewer"></main>
+            <div id="dock-resizer" class="resizer h-res"></div>
+            <aside id="dock">
+                <div id="dock-bar">
+                    <div id="dock-presets">
+                        <button class="dock-preset" data-url="https://app.f1livepulse.com/live-timing">F1 Телеметрия</button>
+                    </div>
+                    <div class="dock-input-row">
+                        <input id="dock-url-input" type="text" placeholder="URL сайта" autocomplete="off" spellcheck="false">
+                        <button id="dock-go">Открыть</button>
+                    </div>
+                </div>
+                <iframe id="dock-frame" src="about:blank" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </aside>
+        </div>
     </div>
     <script src="js/app.js"></script>
 </body>
