@@ -647,6 +647,28 @@ html, body {
 
 .about-footer a:hover { color: #d0d0d0; }
 
+.about-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.about-channels a {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 8px;
+    transition: color 0.12s, border-color 0.12s;
+}
+
+.about-channels a:hover {
+    color: var(--text);
+    border-color: #383838;
+}
+
 .cal-round {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
