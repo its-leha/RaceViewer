@@ -86,7 +86,6 @@ html, body {
     align-items: center;
 }
 
-#dock-btn,
 #hide-btn {
     background: none;
     border: none;
@@ -99,10 +98,7 @@ html, body {
     transition: color 0.12s;
 }
 
-#dock-btn:hover,
 #hide-btn:hover { color: var(--text); }
-
-#dock-btn.active { color: #686868; }
 
 /* ── Main area (viewer + dock) ── */
 #main-area {
@@ -307,8 +303,8 @@ html, body {
 .sugg-card:hover { background: #151515; }
 
 .sugg-thumb {
-    width: 80px;
-    height: 46px;
+    width: 130px;
+    height: 74px;
     border-radius: 3px;
     flex-shrink: 0;
     position: relative;
@@ -345,16 +341,16 @@ html, body {
 }
 
 .sugg-card-title {
-    font-size: 11px;
+    font-size: 13px;
     color: #c0c0c0;
     line-height: 1.3;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-.sugg-duration { font-size: 10px; color: var(--text-dim); }
+.sugg-duration { font-size: 12px; color: var(--text-dim); }
 
 /* ── Opacity states ── */
 .panel-placeholder {
@@ -483,95 +479,21 @@ html, body {
     display: flex;
 }
 
-#dock-bar {
-    padding: 10px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-#dock-presets {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-
-.dock-preset {
-    background: var(--btn-bg);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    transition: background 0.12s, color 0.12s;
-}
-
-.dock-preset:hover { background: var(--btn-hover); color: var(--text); }
-.dock-preset.active { border-color: #404040; color: #848484; }
-
-.dock-input-row {
-    display: flex;
-    gap: 6px;
-}
-
-#dock-url-input {
-    flex: 1;
-    background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    color: var(--text);
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    outline: none;
-    transition: border-color 0.12s;
-    min-width: 0;
-}
-
-#dock-url-input:focus { border-color: #383838; }
-#dock-url-input::placeholder { color: var(--text-dim); }
-
-#dock-go {
-    background: var(--btn-bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    white-space: nowrap;
-    transition: background 0.12s;
-    flex-shrink: 0;
-}
-
-#dock-go:hover { background: var(--btn-hover); }
-
-#dock-frame {
-    flex: 1;
-    width: 100%;
-    border: none;
-    background: #0e0e0e;
-}
-
 /* ── Calendar header button ── */
 #cal-btn {
     background: none;
     border: none;
-    color: var(--text-dim);
     cursor: pointer;
     padding: 4px 6px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.12s;
 }
 
 #cal-btn img {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     opacity: 0.45;
     transition: opacity 0.12s;
 }
@@ -579,32 +501,32 @@ html, body {
 #cal-btn:hover img { opacity: 0.85; }
 #cal-btn.active img { opacity: 1; }
 
-/* ── Calendar bar ── */
-#calendar-bar {
-    display: none;
-    overflow-x: auto;
-    overflow-y: hidden;
+/* ── Calendar sidebar ── */
+#cal-sidebar-head {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
     border-bottom: 1px solid var(--border);
-    background: #0b0b0b;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
     flex-shrink: 0;
 }
 
-#calendar-bar.active { display: flex; }
-
 #cal-grid {
-    display: flex;
-    min-width: max-content;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .cal-round {
-    width: 200px;
     padding: 10px 12px;
-    border-right: 1px solid var(--border);
-    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .cal-round.cal-past { opacity: 0.32; }
-.cal-round.cal-next { border-top: 2px solid #383838; }
+.cal-round.cal-next { border-left: 2px solid #404040; padding-left: 10px; }
 
 .cal-round-header {
     display: flex;

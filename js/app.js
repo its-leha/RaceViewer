@@ -515,61 +515,48 @@ function renderCalendar(races) {
 
     if (nextIndex >= 0) {
         const nextEl = grid.querySelector('.cal-next');
-        if (nextEl) setTimeout(() => nextEl.scrollIntoView({ inline: 'start', behavior: 'instant' }), 0);
+        if (nextEl) setTimeout(() => nextEl.scrollIntoView({ block: 'start', behavior: 'instant' }), 0);
     }
 }
 
-// ── Dock ──────────────────────────────────────────────────────────────────
+// ── Calendar sidebar ──────────────────────────────────────────────────────
 
-function initDock() {
-    const dock     = document.getElementById('dock');
-    const dockRes  = document.getElementById('dock-resizer');
-    const dockBtn  = document.getElementById('dock-btn');
-    const frame    = document.getElementById('dock-frame');
-    const urlInput = document.getElementById('dock-url-input');
-    const goBtn    = document.getElementById('dock-go');
+function initCalHeader() {
+    const calBtn = document.getElementById('cal-btn');
+    const calPanel = document.getElementById('dock');
+    const calRes  = document.getElementById('dock-resizer');
+    let calLoaded = false;
 
-    function toggleDock() {
-        const open = dock.classList.toggle('active');
-        dockRes.classList.toggle('active', open);
-        dockBtn.classList.toggle('active', open);
-    }
+    calBtn.addEventListener('click', async () => {
+        const active = calPanel.classList.toggle('active');
+        calRes.classList.toggle('active', active);
+        calBtn.classList.toggle('active', active);
 
-    function loadUrl(url) {
-        if (!url) return;
-        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-        frame.src = url;
-        urlInput.value = url;
-        document.querySelectorAll('.dock-preset').forEach(b =>
-            b.classList.toggle('active', b.dataset.url === url));
-    }
+        if (active && !calLoaded) {
+            document.getElementById('cal-grid').innerHTML =
+                '<div style="padding:16px 12px;color:#404040;font-size:12px;">Загрузка...</div>';
+            const races = await fetchCalendar();
+            renderCalendar(races);
+            calLoaded = true;
+        }
+    });
 
-    dockBtn.addEventListener('click', toggleDock);
-    goBtn.addEventListener('click', () => loadUrl(urlInput.value.trim()));
-    urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') loadUrl(urlInput.value.trim()); });
-
-    document.querySelectorAll('.dock-preset').forEach(b =>
-        b.addEventListener('click', () => {
-            if (!dock.classList.contains('active')) toggleDock();
-            loadUrl(b.dataset.url);
-        }));
-
-    // Dock resizer — drag left edge to resize
+    // Resizer — drag left edge to resize panel width
     let startX, startW;
-    dockRes.addEventListener('mousedown', e => {
+    calRes.addEventListener('mousedown', e => {
         startX = e.clientX;
-        startW = dock.offsetWidth;
-        dockRes.classList.add('dragging');
+        startW = calPanel.offsetWidth;
+        calRes.classList.add('dragging');
         document.body.style.cursor = 'col-resize';
         document.body.style.userSelect = 'none';
         document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = 'none');
 
         function onMove(e) {
             const delta = startX - e.clientX;
-            dock.style.width = Math.max(220, Math.min(900, startW + delta)) + 'px';
+            calPanel.style.width = Math.max(220, Math.min(700, startW + delta)) + 'px';
         }
         function onEnd() {
-            dockRes.classList.remove('dragging');
+            calRes.classList.remove('dragging');
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
             document.querySelectorAll('iframe').forEach(f => f.style.pointerEvents = '');
@@ -578,27 +565,6 @@ function initDock() {
         }
         document.addEventListener('mousemove', onMove);
         document.addEventListener('mouseup', onEnd);
-    });
-}
-
-// ── Calendar header ───────────────────────────────────────────────────────
-
-function initCalHeader() {
-    const calBtn = document.getElementById('cal-btn');
-    const calBar = document.getElementById('calendar-bar');
-    let calLoaded = false;
-
-    calBtn.addEventListener('click', async () => {
-        const active = calBar.classList.toggle('active');
-        calBtn.classList.toggle('active', active);
-
-        if (active && !calLoaded) {
-            document.getElementById('cal-grid').innerHTML =
-                '<div style="padding:16px 20px;color:#404040;font-size:12px;">Загрузка...</div>';
-            const races = await fetchCalendar();
-            renderCalendar(races);
-            calLoaded = true;
-        }
     });
 }
 
@@ -638,6 +604,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     buildLayout(state.layout);
     updateViewerClass();
-    initDock();
     initCalHeader();
 });
