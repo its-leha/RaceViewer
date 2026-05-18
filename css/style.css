@@ -778,9 +778,9 @@ html, body {
 
     .logo { display: none; }
 
-    /* Hide 3- and 4-panel layout buttons */
-    .layout-btn[data-layout="3"],
-    .layout-btn[data-layout="4"] { display: none; }
+    /* Hide all layout buttons and fullscreen toggle on mobile */
+    .layout-selector { display: none; }
+    #hide-btn { display: none; }
 
     /* Sidebar becomes fullscreen modal */
     #dock {
