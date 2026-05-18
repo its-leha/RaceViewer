@@ -433,19 +433,23 @@ function buildLayout(n) {
 
 // ── Calendar ───────────────────────────────────────────────────────────────
 
-const COUNTRY_FLAGS = {
-    'Bahrain': '🇧🇭', 'Saudi Arabia': '🇸🇦', 'Australia': '🇦🇺',
-    'Japan': '🇯🇵', 'China': '🇨🇳', 'USA': '🇺🇸', 'United States': '🇺🇸',
-    'Italy': '🇮🇹', 'Monaco': '🇲🇨', 'Canada': '🇨🇦', 'Spain': '🇪🇸',
-    'Austria': '🇦🇹', 'UK': '🇬🇧', 'United Kingdom': '🇬🇧', 'Great Britain': '🇬🇧',
-    'Hungary': '🇭🇺', 'Belgium': '🇧🇪', 'Netherlands': '🇳🇱', 'Azerbaijan': '🇦🇿',
-    'Singapore': '🇸🇬', 'Mexico': '🇲🇽', 'Brazil': '🇧🇷', 'Qatar': '🇶🇦',
-    'UAE': '🇦🇪', 'United Arab Emirates': '🇦🇪', 'Portugal': '🇵🇹',
-    'France': '🇫🇷', 'Germany': '🇩🇪', 'Russia': '🇷🇺', 'Turkey': '🇹🇷',
-    'Vietnam': '🇻🇳', 'Indonesia': '🇮🇩', 'South Africa': '🇿🇦',
+const COUNTRY_ISO = {
+    'Bahrain': 'bh', 'Saudi Arabia': 'sa', 'Australia': 'au',
+    'Japan': 'jp', 'China': 'cn', 'USA': 'us', 'United States': 'us',
+    'Italy': 'it', 'Monaco': 'mc', 'Canada': 'ca', 'Spain': 'es',
+    'Austria': 'at', 'UK': 'gb', 'United Kingdom': 'gb', 'Great Britain': 'gb',
+    'Hungary': 'hu', 'Belgium': 'be', 'Netherlands': 'nl', 'Azerbaijan': 'az',
+    'Singapore': 'sg', 'Mexico': 'mx', 'Brazil': 'br', 'Qatar': 'qa',
+    'UAE': 'ae', 'United Arab Emirates': 'ae', 'Portugal': 'pt',
+    'France': 'fr', 'Germany': 'de', 'Russia': 'ru', 'Turkey': 'tr',
+    'Vietnam': 'vn', 'Indonesia': 'id', 'South Africa': 'za',
 };
 
-function countryFlag(country) { return COUNTRY_FLAGS[country] ?? ''; }
+function countryFlag(country) {
+    const iso = COUNTRY_ISO[country];
+    if (!iso) return '';
+    return `<img class="cal-flag-img" src="https://flagcdn.com/20x15/${iso}.png" alt="${escHtml(country)}">`;
+}
 
 const JOLPICA = 'https://api.jolpi.ca/ergast/f1';
 
@@ -477,13 +481,13 @@ function buildCalSessions(race) {
         if (!d || isNaN(d)) return;
         rows.push({ label, d });
     }
-    add('FP1',      race.FirstPractice?.date,      race.FirstPractice?.time);
-    add('FP2',      race.SecondPractice?.date,      race.SecondPractice?.time);
-    add('FP3',      race.ThirdPractice?.date,       race.ThirdPractice?.time);
-    add('Sprint Q', race.SprintQualifying?.date,    race.SprintQualifying?.time);
-    add('Спринт',   race.Sprint?.date,              race.Sprint?.time);
-    add('Квали',    race.Qualifying?.date,          race.Qualifying?.time);
-    add('Гонка',    race.date,                      race.time);
+    add('FP1',             race.FirstPractice?.date,      race.FirstPractice?.time);
+    add('FP2',             race.SecondPractice?.date,      race.SecondPractice?.time);
+    add('FP3',             race.ThirdPractice?.date,       race.ThirdPractice?.time);
+    add('Квали спринта',   race.SprintQualifying?.date,    race.SprintQualifying?.time);
+    add('Спринт',          race.Sprint?.date,              race.Sprint?.time);
+    add('Квалификация',    race.Qualifying?.date,          race.Qualifying?.time);
+    add('Гонка',           race.date,                      race.time);
     rows.sort((a, b) => a.d - b.d);
     return rows.map(({ label, d }) => ({
         label,
@@ -512,7 +516,7 @@ function renderCalendar(races) {
         <div class="cal-round${isPast ? ' cal-past' : ''}${i === nextIndex ? ' cal-next' : ''}">
             <div class="cal-round-header">
                 <div>
-                    <div class="cal-location">${flag ? `<span class="cal-flag">${flag}</span>` : ''}${race.Circuit.Location.locality}</div>
+                    <div class="cal-location">${flag}${escHtml(race.Circuit.Location.locality)}</div>
                     <div class="cal-name">${race.raceName}</div>
                 </div>
                 <span class="cal-round-num">R${race.round}</span>
