@@ -233,14 +233,16 @@ function renderPlaceholder(el, id) {
             </div>
             <span class="url-hint">youtube.com · youtu.be · vk.com/video · rutube.ru</span>
             <span class="or-sep">или</span>
-            <button class="telemetry-btn">
-                <img src="src/icon/RacePulse.svg" alt="">
-                RacePulse телеметрия
-            </button>
-            <button class="suggest-btn">
-                <img src="src/icon/star1.svg" alt="">
-                Предложить гонку
-            </button>
+            <div class="alt-btns">
+                <button class="telemetry-btn">
+                    <img src="src/icon/RacePulse.svg" alt="">
+                    RacePulse телеметрия
+                </button>
+                <button class="suggest-btn">
+                    <img src="src/icon/star1.svg" alt="">
+                    Предложить гонку
+                </button>
+            </div>
         </div>`;
 
     const input = el.querySelector('.url-input');
@@ -471,8 +473,8 @@ function buildCalSessions(race) {
     rows.sort((a, b) => a.d - b.d);
     return rows.map(({ label, d }) => ({
         label,
-        date: d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }),
-        time: d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+        date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', timeZone: 'Europe/Moscow' }),
+        time: d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow', hour12: false })
     }));
 }
 
@@ -544,6 +546,10 @@ function initCalHeader() {
         calBtn.classList.toggle('active', activeSection === 'cal');
         aboutBtn.classList.toggle('active', activeSection === 'about');
     }
+
+    document.querySelectorAll('.sidebar-close').forEach(btn => {
+        btn.addEventListener('click', () => openSection(activeSection));
+    });
 
     calBtn.addEventListener('click', async () => {
         openSection('cal');
@@ -619,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.ctrlKey && e.key === 'h') { e.preventDefault(); toggleHeader(); }
     });
 
-    buildLayout(state.layout);
+    buildLayout(window.innerWidth <= 700 ? Math.min(state.layout, 2) : state.layout);
     updateViewerClass();
     initCalHeader();
 });

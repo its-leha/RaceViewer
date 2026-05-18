@@ -199,6 +199,13 @@ html, body {
     user-select: none;
 }
 
+.alt-btns {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
 .telemetry-btn {
     display: flex;
     align-items: center;
@@ -553,6 +560,7 @@ html, body {
     height: 36px;
     display: flex;
     align-items: center;
+    gap: 8px;
     padding: 0 12px;
     border-bottom: 1px solid var(--border);
     font-size: 9px;
@@ -561,6 +569,28 @@ html, body {
     color: var(--text-dim);
     flex-shrink: 0;
 }
+
+.cal-tz-note {
+    font-size: 8px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+}
+
+.sidebar-close {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    line-height: 1;
+    margin-left: auto;
+    transition: color 0.12s;
+}
+
+.sidebar-close:hover { color: var(--text); }
 
 #cal-grid {
     flex: 1;
@@ -683,7 +713,7 @@ html, body {
 }
 
 .cal-round-num {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--text-dim);
     letter-spacing: 0.08em;
     padding-top: 2px;
@@ -691,14 +721,14 @@ html, body {
 }
 
 .cal-location {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 600;
     color: #c0c0c0;
     line-height: 1.3;
 }
 
 .cal-name {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--text-dim);
     margin-top: 1px;
 }
@@ -707,22 +737,22 @@ html, body {
 
 .cal-session {
     display: grid;
-    grid-template-columns: 50px 1fr auto;
+    grid-template-columns: 72px 1fr auto;
     gap: 4px;
     align-items: baseline;
 }
 
 .cal-sess-name {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--text-dim);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
 
-.cal-sess-date { font-size: 10px; color: var(--text); }
+.cal-sess-date { font-size: 15px; color: var(--text); }
 
 .cal-sess-time {
-    font-size: 10px;
+    font-size: 15px;
     font-family: 'Courier New', monospace;
     color: var(--text);
     font-variant-numeric: tabular-nums;
@@ -747,4 +777,39 @@ html, body {
     }
 
     .logo { display: none; }
+
+    /* Hide 3- and 4-panel layout buttons */
+    .layout-btn[data-layout="3"],
+    .layout-btn[data-layout="4"] { display: none; }
+
+    /* Sidebar becomes fullscreen modal */
+    #dock {
+        position: fixed;
+        inset: 0;
+        width: 100% !important;
+        z-index: 100;
+        border-left: none;
+    }
+
+    #dock-resizer { display: none !important; }
+
+    .sidebar-close {
+        display: flex;
+        align-items: center;
+    }
+
+    /* Panel buttons — smaller and horizontal */
+    .alt-btns { flex-direction: row; }
+
+    .telemetry-btn,
+    .suggest-btn {
+        padding: 5px 11px;
+        font-size: 11px;
+    }
+
+    .telemetry-btn img,
+    .suggest-btn img {
+        width: 20px;
+        height: 20px;
+    }
 }
