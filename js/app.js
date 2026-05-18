@@ -39,7 +39,8 @@ function parseYouTube(url) {
         }
 
         if (id && /^[\w-]{11}$/.test(id)) {
-            return `https://www.youtube.com/embed/${id}?rel=0`;
+            const params = new URLSearchParams({ rel: '0', origin: location.origin });
+            return `https://www.youtube-nocookie.com/embed/${id}?${params}`;
         }
     } catch (_) {}
     return null;
