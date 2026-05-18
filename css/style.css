@@ -708,9 +708,12 @@ html, body {
 .cal-round-header {
     display: flex;
     align-items: flex-start;
+    justify-content: space-between;
     gap: 6px;
     margin-bottom: 7px;
 }
+
+.cal-flag { margin-right: 5px; }
 
 .cal-round-num {
     font-size: 13px;
@@ -781,6 +784,9 @@ html, body {
     /* Hide all layout buttons and fullscreen toggle on mobile */
     .layout-selector { display: none; }
     #hide-btn { display: none; }
+
+    /* Push header controls to the right */
+    #header { justify-content: flex-end; }
 
     /* Sidebar becomes fullscreen modal */
     #dock {

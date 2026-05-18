@@ -433,6 +433,20 @@ function buildLayout(n) {
 
 // ── Calendar ───────────────────────────────────────────────────────────────
 
+const COUNTRY_FLAGS = {
+    'Bahrain': '🇧🇭', 'Saudi Arabia': '🇸🇦', 'Australia': '🇦🇺',
+    'Japan': '🇯🇵', 'China': '🇨🇳', 'USA': '🇺🇸', 'United States': '🇺🇸',
+    'Italy': '🇮🇹', 'Monaco': '🇲🇨', 'Canada': '🇨🇦', 'Spain': '🇪🇸',
+    'Austria': '🇦🇹', 'UK': '🇬🇧', 'United Kingdom': '🇬🇧', 'Great Britain': '🇬🇧',
+    'Hungary': '🇭🇺', 'Belgium': '🇧🇪', 'Netherlands': '🇳🇱', 'Azerbaijan': '🇦🇿',
+    'Singapore': '🇸🇬', 'Mexico': '🇲🇽', 'Brazil': '🇧🇷', 'Qatar': '🇶🇦',
+    'UAE': '🇦🇪', 'United Arab Emirates': '🇦🇪', 'Portugal': '🇵🇹',
+    'France': '🇫🇷', 'Germany': '🇩🇪', 'Russia': '🇷🇺', 'Turkey': '🇹🇷',
+    'Vietnam': '🇻🇳', 'Indonesia': '🇮🇩', 'South Africa': '🇿🇦',
+};
+
+function countryFlag(country) { return COUNTRY_FLAGS[country] ?? ''; }
+
 const JOLPICA = 'https://api.jolpi.ca/ergast/f1';
 
 let _calData = null;
@@ -493,14 +507,15 @@ function renderCalendar(races) {
         if (!isPast && nextIndex === -1) nextIndex = i;
 
         const sessions = buildCalSessions(race);
+        const flag = countryFlag(race.Circuit.Location.country);
         return `
         <div class="cal-round${isPast ? ' cal-past' : ''}${i === nextIndex ? ' cal-next' : ''}">
             <div class="cal-round-header">
-                <span class="cal-round-num">R${race.round}</span>
                 <div>
-                    <div class="cal-location">${race.Circuit.Location.locality}, ${race.Circuit.Location.country}</div>
+                    <div class="cal-location">${flag ? `<span class="cal-flag">${flag}</span>` : ''}${race.Circuit.Location.locality}</div>
                     <div class="cal-name">${race.raceName}</div>
                 </div>
+                <span class="cal-round-num">R${race.round}</span>
             </div>
             <div class="cal-sessions">
                 ${sessions.map(s => `
