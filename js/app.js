@@ -283,12 +283,14 @@ function renderPlaceholder(el, id) {
 
 function renderVideo(el, id, url) {
     const embed = toEmbedUrl(url);
+    const isYT = /youtube\.com|youtu\.be/.test(url);
     el.innerHTML = `
         <iframe class="panel-video" src="${embed}"
             allow="autoplay; fullscreen; picture-in-picture; storage-access"
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade">
         </iframe>
+        ${isYT ? `<div class="yt-hint">YouTube просит войти? <a href="https://www.youtube.com" target="_blank" rel="noopener">Откройте YouTube</a>, войдите и вернитесь</div>` : ''}
         <div class="panel-overlay">
             <button class="overlay-btn" data-action="clear">Изменить</button>
         </div>`;
