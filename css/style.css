@@ -441,7 +441,7 @@ html, body {
     color: #666;
     font-size: 11px;
     text-align: center;
-    padding: 5px 10px;
+    padding: 5px 28px 5px 10px;
     z-index: 4;
 }
 .yt-hint a {
@@ -460,6 +460,20 @@ html, body {
     vertical-align: middle;
 }
 .yt-reload:hover { border-color: #888; color: #ddd; }
+.yt-hint-close {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #555;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 4px;
+    line-height: 1;
+}
+.yt-hint-close:hover { color: #aaa; }
 
 .overlay-btn {
     background: rgba(0, 0, 0, 0.72);
