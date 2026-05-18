@@ -481,13 +481,13 @@ function buildCalSessions(race) {
         if (!d || isNaN(d)) return;
         rows.push({ label, d });
     }
-    add('FP1',             race.FirstPractice?.date,      race.FirstPractice?.time);
-    add('FP2',             race.SecondPractice?.date,      race.SecondPractice?.time);
-    add('FP3',             race.ThirdPractice?.date,       race.ThirdPractice?.time);
-    add('Квали спринта',   race.SprintQualifying?.date,    race.SprintQualifying?.time);
-    add('Спринт',          race.Sprint?.date,              race.Sprint?.time);
-    add('Квалификация',    race.Qualifying?.date,          race.Qualifying?.time);
-    add('Гонка',           race.date,                      race.time);
+    add('Свободная практика 1',  race.FirstPractice?.date,      race.FirstPractice?.time);
+    add('Свободная практика 2',  race.SecondPractice?.date,     race.SecondPractice?.time);
+    add('Свободная практика 3',  race.ThirdPractice?.date,      race.ThirdPractice?.time);
+    add('Квалификация спринта',  race.SprintQualifying?.date,   race.SprintQualifying?.time);
+    add('Спринт',                race.Sprint?.date,             race.Sprint?.time);
+    add('Квалификация',          race.Qualifying?.date,         race.Qualifying?.time);
+    add('Гонка',                 race.date,                     race.time);
     rows.sort((a, b) => a.d - b.d);
     return rows.map(({ label, d }) => ({
         label,
@@ -525,8 +525,7 @@ function renderCalendar(races) {
                 ${sessions.map(s => `
                 <div class="cal-session">
                     <span class="cal-sess-name">${s.label}</span>
-                    <span class="cal-sess-date">${s.date}</span>
-                    <span class="cal-sess-time">${s.time}</span>
+                    <span class="cal-sess-dt"><span class="cal-sess-date">${s.date}</span><span class="cal-sess-time">${s.time}</span></span>
                 </div>`).join('')}
             </div>
         </div>`;

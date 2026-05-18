@@ -746,20 +746,27 @@ html, body {
     margin-top: 1px;
 }
 
-.cal-sessions { display: flex; flex-direction: column; gap: 2px; }
-
-.cal-session {
+.cal-sessions {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 4px 8px;
+    grid-template-columns: 1fr auto;
+    row-gap: 4px;
+    column-gap: 12px;
     align-items: baseline;
 }
+
+.cal-session { display: contents; }
 
 .cal-sess-name {
     font-size: 13px;
     color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+}
+
+.cal-sess-dt {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    white-space: nowrap;
+    justify-content: flex-end;
 }
 
 .cal-sess-date { font-size: 15px; color: var(--text); }
