@@ -46,6 +46,21 @@ function parseYouTube(url) {
     return null;
 }
 
+function getYouTubeId(url) {
+    try {
+        const u = new URL(url);
+        if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('?')[0] || null;
+        if (u.hostname.includes('youtube.com')) {
+            const seg = u.pathname.split('/').filter(Boolean);
+            if (seg[0] === 'watch')   return u.searchParams.get('v');
+            if (seg[0] === 'live')    return seg[1] || null;
+            if (seg[0] === 'embed')   return seg[1] || null;
+            if (seg[0] === 'shorts')  return seg[1] || null;
+        }
+    } catch (_) {}
+    return null;
+}
+
 function parseVK(url) {
     try {
         const u = new URL(url);
@@ -194,7 +209,9 @@ function makePanel(id) {
     if (state.videos[id] === TELEMETRY_MARKER) {
         renderTelemetry(el, id);
     } else if (state.videos[id]) {
-        renderVideo(el, id, state.videos[id]);
+        const isYT = /youtube\.com|youtu\.be/.test(state.videos[id]);
+        if (isYT) renderVideoPreview(el, id, state.videos[id]);
+        else      renderVideo(el, id, state.videos[id]);
     } else {
         renderPlaceholder(el, id);
     }
@@ -303,6 +320,25 @@ function renderVideo(el, id, url) {
     });
 
     updateViewerClass();
+}
+
+function renderVideoPreview(el, id, url) {
+    const ytId = getYouTubeId(url);
+    const thumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '';
+    el.innerHTML = `
+        <div class="panel-preview"${thumb ? ` style="background-image:url('${escHtml(thumb)}')"` : ''}>
+            <button class="preview-play" aria-label="Воспроизвести">▶</button>
+            <div class="panel-overlay">
+                <button class="overlay-btn" data-action="clear">Изменить</button>
+            </div>
+        </div>`;
+    el.querySelector('.preview-play').addEventListener('click', () => renderVideo(el, id, url));
+    el.querySelector('[data-action="clear"]').addEventListener('click', () => {
+        delete state.videos[id];
+        persist();
+        renderPlaceholder(el, id);
+        updateViewerClass();
+    });
 }
 
 // ── Dimming ────────────────────────────────────────────────────────────────
