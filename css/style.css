@@ -443,15 +443,12 @@ html, body {
     text-align: center;
     padding: 5px 10px;
     z-index: 4;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
 }
 .yt-hint a {
-    color: #999;
-    pointer-events: all;
+    color: #aaa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
 }
-.panel:hover .yt-hint { opacity: 1; }
 
 .overlay-btn {
     background: rgba(0, 0, 0, 0.72);

@@ -307,7 +307,7 @@ function renderVideo(el, id, url) {
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade">
         </iframe>
-        ${isYT ? `<div class="yt-hint">YouTube просит войти? <a href="https://www.youtube.com" target="_blank" rel="noopener">Откройте YouTube</a>, войдите и вернитесь</div>` : ''}
+        ${isYT ? `<div class="yt-hint"><a href="https://www.youtube.com" target="_blank" rel="noopener">Войти в YouTube</a> — если плеер просит авторизацию</div>` : ''}
         <div class="panel-overlay">
             <button class="overlay-btn" data-action="clear">Изменить</button>
         </div>`;
