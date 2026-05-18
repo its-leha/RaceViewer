@@ -40,7 +40,7 @@ function parseYouTube(url) {
 
         if (id && /^[\w-]{11}$/.test(id)) {
             const params = new URLSearchParams({ rel: '0', origin: location.origin });
-            return `https://www.youtube-nocookie.com/embed/${id}?${params}`;
+            return `https://www.youtube.com/embed/${id}?${params}`;
         }
     } catch (_) {}
     return null;
@@ -285,7 +285,7 @@ function renderVideo(el, id, url) {
     const embed = toEmbedUrl(url);
     el.innerHTML = `
         <iframe class="panel-video" src="${embed}"
-            allow="autoplay; fullscreen; picture-in-picture"
+            allow="autoplay; fullscreen; picture-in-picture; storage-access"
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade">
         </iframe>
