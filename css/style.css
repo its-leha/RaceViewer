@@ -449,6 +449,17 @@ html, body {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
+.yt-reload {
+    background: none;
+    border: 1px solid #555;
+    color: #aaa;
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 3px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+.yt-reload:hover { border-color: #888; color: #ddd; }
 
 .overlay-btn {
     background: rgba(0, 0, 0, 0.72);

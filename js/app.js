@@ -307,7 +307,7 @@ function renderVideo(el, id, url) {
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade">
         </iframe>
-        ${isYT ? `<div class="yt-hint"><a href="https://www.youtube.com" target="_blank" rel="noopener">Войти в YouTube</a> — если плеер просит авторизацию</div>` : ''}
+        ${isYT ? `<div class="yt-hint"><a href="https://www.youtube.com" target="_blank" rel="noopener">Войти в YouTube</a> — если просит авторизацию, войдите и нажмите <button class="yt-reload">Обновить</button></div>` : ''}
         <div class="panel-overlay">
             <button class="overlay-btn" data-action="clear">Изменить</button>
         </div>`;
@@ -318,6 +318,8 @@ function renderVideo(el, id, url) {
         renderPlaceholder(el, id);
         updateViewerClass();
     });
+
+    el.querySelector('.yt-reload')?.addEventListener('click', () => renderVideo(el, id, url));
 
     updateViewerClass();
 }
