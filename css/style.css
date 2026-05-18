@@ -763,17 +763,15 @@ html, body {
 
 .cal-sess-dt {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     align-items: baseline;
     white-space: nowrap;
     justify-content: flex-end;
 }
 
-.cal-sess-date { font-size: 15px; color: var(--text); }
-
+.cal-sess-date,
 .cal-sess-time {
     font-size: 15px;
-    font-family: 'Courier New', monospace;
     color: var(--text);
     font-variant-numeric: tabular-nums;
 }
