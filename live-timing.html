@@ -365,7 +365,6 @@ async function connect() {
   }
 
   ws.onopen = () => {
-    ws.send(JSON.stringify({ H:'streaming', M:'Subscribe', A:[TOPICS], I: msgI++ }));
     setDot('connected');
     if (!hasData) showOverlay('Подключено', 'Ожидание данных сессии…');
     keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
@@ -378,7 +377,8 @@ async function connect() {
   ws.onclose = e => {
     clearInterval(keepAlive);
     setDot('error');
-    if (!hasData) showOverlay('Соединение разорвано', `код ${e.code} · повтор через 5 с`, true);
+    const detail = e.reason ? `${e.code} · ${e.reason}` : `код ${e.code}`;
+    if (!hasData) showOverlay('Соединение разорвано', `${detail} · повтор через 5 с`, true);
     reconnTimer = setTimeout(connect, 5000);
   };
 
