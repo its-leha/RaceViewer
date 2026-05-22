@@ -12,9 +12,22 @@
         <header id="header">
             <span class="logo">RaceViewer</span>
             <div class="layout-selector">
-                <button class="layout-btn" data-layout="2">2</button>
-                <button class="layout-btn" data-layout="3">3</button>
-                <button class="layout-btn" data-layout="4">4</button>
+                <button class="layout-btn" data-layout="2" title="2 панели">
+                    <svg viewBox="0 0 20 16" fill="currentColor"><rect x="0" y="0" width="9" height="16" rx="1"/><rect x="11" y="0" width="9" height="16" rx="1"/></svg>
+                </button>
+                <button class="layout-btn" data-layout="3" title="3 панели">
+                    <svg viewBox="0 0 20 16" fill="currentColor"><rect x="0" y="0" width="9" height="16" rx="1"/><rect x="11" y="0" width="9" height="7" rx="1"/><rect x="11" y="9" width="9" height="7" rx="1"/></svg>
+                </button>
+                <button class="layout-btn" data-layout="4" title="4 панели">
+                    <svg viewBox="0 0 20 16" fill="currentColor"><rect x="0" y="0" width="9" height="7" rx="1"/><rect x="11" y="0" width="9" height="7" rx="1"/><rect x="0" y="9" width="9" height="7" rx="1"/><rect x="11" y="9" width="9" height="7" rx="1"/></svg>
+                </button>
+                <span class="layout-sep"></span>
+                <button class="layout-btn" data-layout="5" title="2 панели вертикально">
+                    <svg viewBox="0 0 20 16" fill="currentColor"><rect x="0" y="0" width="20" height="7" rx="1"/><rect x="0" y="9" width="20" height="7" rx="1"/></svg>
+                </button>
+                <button class="layout-btn" data-layout="6" title="3 панели вертикально">
+                    <svg viewBox="0 0 20 16" fill="currentColor"><rect x="0" y="0" width="20" height="4" rx="1"/><rect x="0" y="6" width="20" height="4" rx="1"/><rect x="0" y="12" width="20" height="4" rx="1"/></svg>
+                </button>
             </div>
             <div class="header-right">
                 <button id="about-btn" title="О сервисе">

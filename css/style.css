@@ -61,12 +61,31 @@ html, body {
     background: var(--btn-bg);
     border: 1px solid var(--border);
     color: var(--text-dim);
-    width: 32px;
+    min-width: 32px;
     height: 26px;
+    padding: 0 6px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.layout-btn svg {
+    width: 20px;
+    height: 16px;
+    display: block;
+}
+
+.layout-sep {
+    width: 1px;
+    height: 16px;
+    background: var(--border);
+    flex-shrink: 0;
+    align-self: center;
+    margin: 0 2px;
 }
 
 .layout-btn:hover {

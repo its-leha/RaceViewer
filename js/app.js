@@ -16,7 +16,7 @@ function restoreState() {
         const raw = localStorage.getItem('rv_state');
         if (!raw) return;
         const s = JSON.parse(raw);
-        if ([2, 3, 4].includes(s.layout)) state.layout = s.layout;
+        if ([2, 3, 4, 5, 6].includes(s.layout)) state.layout = s.layout;
         if (s.videos && typeof s.videos === 'object') state.videos = s.videos;
     } catch (_) {}
 }
@@ -431,6 +431,7 @@ function attachResizer(resizerEl, prevEl, nextEl, logicalDir) {
 function buildLayout(n) {
     const viewer = document.getElementById('viewer');
     viewer.innerHTML = '';
+    viewer.style.flexDirection = '';   // reset to CSS default (row)
 
     if (n === 2) {
         const p1 = makePanel(1), r = makeResizer('h-res'), p2 = makePanel(2);
@@ -470,6 +471,25 @@ function buildLayout(n) {
         attachResizer(rH,  col1, col2, 'h-res');
         attachResizer(rV1, p1,   p3,   'v-res');
         attachResizer(rV2, p2,   p4,   'v-res');
+    }
+
+    else if (n === 5) {
+        // Two panels stacked vertically (portrait monitors)
+        viewer.style.flexDirection = 'column';
+        const p1 = makePanel(1), r = makeResizer('v-res'), p2 = makePanel(2);
+        viewer.append(p1, r, p2);
+        attachResizer(r, p1, p2, 'v-res');
+    }
+
+    else if (n === 6) {
+        // Three panels stacked vertically (portrait monitors)
+        viewer.style.flexDirection = 'column';
+        const p1 = makePanel(1), r1 = makeResizer('v-res'),
+              p2 = makePanel(2), r2 = makeResizer('v-res'),
+              p3 = makePanel(3);
+        viewer.append(p1, r1, p2, r2, p3);
+        attachResizer(r1, p1, p2, 'v-res');
+        attachResizer(r2, p2, p3, 'v-res');
     }
 }
 
