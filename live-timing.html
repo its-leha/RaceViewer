@@ -376,7 +376,7 @@ async function connect() {
             showOverlay('Данные получены, но не распознаны', `Сообщений: ${msgCount} · проверь консоль браузера`);
           }
         }
-      }, 8000);
+      }, 20000);
     }
     keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
   };
