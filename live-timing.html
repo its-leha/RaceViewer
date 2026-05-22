@@ -355,36 +355,11 @@ async function connect() {
   clearTimeout(reconnTimer);
   if (ws) { try { ws.close(); } catch(_) {} ws = null; }
 
-  // Step 1: negotiate (optional — may fail due to CORS, that's OK)
-  let token = null;
   try {
-    const ac  = new AbortController();
-    const tid = setTimeout(() => ac.abort(), 7000);
-    const resp = await fetch(
-      'https://still-disk-17d0.hi-itsleha.workers.dev/?' +
-      `connectionData=${encodeURIComponent(JSON.stringify([{name:'streaming'}]))}&clientProtocol=1.5&_=${Date.now()}`,
-      { credentials: 'omit', signal: ac.signal }
-    );
-    clearTimeout(tid);
-    if (resp.ok) {
-      const neg = await resp.json();
-      token = neg.ConnectionToken || null;
-    }
-  } catch(e) {
-    // CORS or network — try WebSocket without token anyway
-    console.warn('[F1] negotiate skipped:', e.message);
-  }
-
-  // Step 2: WebSocket (browsers don't apply CORS to WS upgrade)
-  const connData = encodeURIComponent(JSON.stringify([{name:'streaming'}]));
-  let wsUrl = `wss://livetiming.formula1.com/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionData=${connData}`;
-  if (token) wsUrl += `&connectionToken=${encodeURIComponent(token)}`;
-
-  try {
-    ws = new WebSocket(wsUrl);
+    ws = new WebSocket('wss://still-disk-17d0.hi-itsleha.workers.dev/');
   } catch(e) {
     setDot('error');
-    showOverlay('Ошибка WebSocket', e.message);
+    showOverlay('Ошибка WebSocket', e.message, true);
     reconnTimer = setTimeout(connect, 6000);
     return;
   }
@@ -407,7 +382,7 @@ async function connect() {
     reconnTimer = setTimeout(connect, 5000);
   };
 
-  ws.onerror = () => { /* onclose fires after */ };
+  ws.onerror = () => {};
 }
 
 function handleMsg(msg) {
