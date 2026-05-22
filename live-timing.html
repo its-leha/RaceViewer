@@ -348,7 +348,7 @@ function merge(tgt, src) {
 
 /* ── SignalR connection ── */
 let ws = null, keepAlive = null, reconnTimer = null, msgI = 1;
-let hasData = false;
+let hasData = false, noSessionTimer = null;
 
 async function connect() {
   setDot('connecting');
@@ -366,7 +366,12 @@ async function connect() {
 
   ws.onopen = () => {
     setDot('connected');
-    if (!hasData) showOverlay('Подключено', 'Ожидание данных сессии…');
+    if (!hasData) {
+      showOverlay('Подключено', 'Ожидание данных сессии…');
+      noSessionTimer = setTimeout(() => {
+        if (!hasData) showOverlay('Нет активной сессии', 'Данные появятся когда начнётся практика, квалификация или гонка');
+      }, 8000);
+    }
     keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
   };
 
@@ -404,14 +409,12 @@ function applyFeed(topic, data) {
   switch (topic) {
     case 'DriverList':
       S.drivers = merge(S.drivers, data);
-      hasData = true;
-      hideOverlay();
+      if (Object.keys(S.drivers).length) { hasData = true; clearTimeout(noSessionTimer); hideOverlay(); }
       renderTower();
       break;
     case 'TimingData':
       if (data.Lines) S.timing = merge(S.timing, data.Lines);
-      hasData = true;
-      hideOverlay();
+      if (Object.keys(S.timing).length) { hasData = true; clearTimeout(noSessionTimer); hideOverlay(); }
       renderTower();
       break;
     case 'TimingAppData':
