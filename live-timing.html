@@ -398,6 +398,11 @@ async function connect() {
 }
 
 function handleMsg(msg) {
+  /* Debug messages from Worker */
+  if (msg.__dbg) {
+    if (!hasData) showOverlay('Подключено', msg.__dbg);
+    return;
+  }
   /* Initial state — comes back in msg.R when subscription is confirmed */
   if (msg.R && typeof msg.R === 'object') {
     for (const [topic, data] of Object.entries(msg.R)) applyFeed(topic, data);
@@ -408,6 +413,10 @@ function handleMsg(msg) {
       if (item.M === 'feed' && Array.isArray(item.A) && item.A.length >= 2)
         applyFeed(item.A[0], item.A[1]);
     }
+  }
+  /* SignalR error response */
+  if (msg.E) {
+    if (!hasData) showOverlay('Ошибка SignalR', msg.E, true);
   }
 }
 
