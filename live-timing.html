@@ -231,21 +231,47 @@
     .rcm-row.flag-VSC    .rcm-msg { color: var(--orange); }
     #rcm-wrap.collapsed #rcm-list { display: none; }
 
-    /* ── Overlay (connecting / no session) ── */
-    #overlay {
+    /* ── Status bar ── */
+    #status-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      height: 22px;
+      background: #110000;
+      border-top: 1px solid #200000;
+      font-size: 10px;
+      color: #904040;
+    }
+    #status-bar.hidden { display: none; }
+
+    /* ── Preloader ── */
+    #preloader {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 16px;
       background: var(--bg);
       z-index: 50;
     }
-    #overlay.hidden { display: none; }
-    #ov-title { font-size: 13px; color: var(--dim); }
-    #ov-sub   { font-size: 11px; color: var(--faint); }
+    #preloader.hidden { display: none; }
+    .pl-dots { display: flex; gap: 8px; align-items: center; }
+    .pl-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--dim);
+      animation: dot-bounce 1.4s infinite ease-in-out both;
+    }
+    .pl-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .pl-dots span:nth-child(2) { animation-delay: -0.16s; }
+    .pl-dots span:nth-child(3) { animation-delay:     0s; }
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+      40%           { transform: scale(1); opacity: 0.8; }
+    }
+    #pl-sub { font-size: 11px; color: var(--dim); }
 
     /* ── Narrow panel adjustments ── */
     @media (max-width: 520px) {
@@ -300,14 +326,13 @@
     <div id="rcm-list"></div>
   </div>
 
-  <!-- Overlay -->
-  <div id="overlay">
-    <span id="ov-title">Подключение к F1 Live Timing…</span>
-    <span id="ov-sub">livetiming.formula1.com</span>
-    <a id="ov-open" href="live-timing.html" target="_blank"
-       style="display:none;margin-top:12px;font-size:11px;color:#505050;text-decoration:underline;cursor:pointer;">
-      Открыть отдельно ↗
-    </a>
+  <!-- Status bar (errors) -->
+  <div id="status-bar" class="hidden"></div>
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="pl-dots"><span></span><span></span><span></span></div>
+    <span id="pl-sub">Подключение к F1 Live Timing…</span>
   </div>
 
 </div>
@@ -322,9 +347,9 @@ const TOPICS = [
 
 /* ── State ── */
 const S = {
-  drivers:    {},   // DriverList
-  timing:     {},   // TimingData.Lines  keyed by racing number
-  appTiming:  {},   // TimingAppData.Lines
+  drivers:    {},
+  timing:     {},
+  appTiming:  {},
   session:    {},
   track:      { Status: '1', Message: 'AllClear' },
   lap:        {},
@@ -354,27 +379,32 @@ let hasData = false, noSessionTimer = null, msgCount = 0;
 async function connect() {
   setDot('connecting');
   clearTimeout(reconnTimer);
+  clearStatus();
   if (ws) { try { ws.close(); } catch(_) {} ws = null; }
+
+  if (!hasData) setPreloaderText('Подключение…');
 
   try {
     ws = new WebSocket('wss://updating-ambien-reprint-each.trycloudflare.com');
   } catch(e) {
     setDot('error');
-    showOverlay('Ошибка WebSocket', e.message, true);
+    if (!hasData) setPreloaderText('Ошибка: ' + e.message);
+    showStatus('Ошибка WebSocket · ' + e.message + ' · повтор через 2 с');
     reconnTimer = setTimeout(connect, 2000);
     return;
   }
 
   ws.onopen = () => {
     setDot('connected');
+    clearStatus();
     if (!hasData) {
-      showOverlay('Подключено', 'Ожидание данных сессии…');
+      setPreloaderText('Ожидание данных сессии…');
       noSessionTimer = setTimeout(() => {
         if (!hasData) {
           if (msgCount === 0) {
-            showOverlay('Нет данных от F1', 'Сообщений не получено — проблема в воркере или сессии нет');
+            setPreloaderText('Нет данных от F1 · сессии нет или проблема с relay');
           } else {
-            showOverlay('Данные получены, но не распознаны', `Сообщений: ${msgCount} · проверь консоль браузера`);
+            setPreloaderText(`Данные получены, но не распознаны · ${msgCount} сообщений`);
           }
         }
       }, 20000);
@@ -391,7 +421,8 @@ async function connect() {
     clearInterval(keepAlive);
     setDot('error');
     const detail = e.reason ? `${e.code} · ${e.reason}` : `код ${e.code}`;
-    if (!hasData) showOverlay('Соединение разорвано', `${detail} · повтор через 5 с`, true);
+    showStatus(`Соединение разорвано · ${detail} · повтор через 2 с`);
+    if (!hasData) setPreloaderText('Соединение разорвано · повтор…');
     reconnTimer = setTimeout(connect, 2000);
   };
 
@@ -399,25 +430,22 @@ async function connect() {
 }
 
 function handleMsg(msg) {
-  /* Debug messages from Worker */
   if (msg.__dbg) {
-    if (!hasData) showOverlay('Подключено', msg.__dbg);
+    if (!hasData) setPreloaderText(msg.__dbg);
     return;
   }
-  /* Initial state — comes back in msg.R when subscription is confirmed */
   if (msg.R && typeof msg.R === 'object') {
     for (const [topic, data] of Object.entries(msg.R)) applyFeed(topic, data);
   }
-  /* Incremental updates */
   if (Array.isArray(msg.M)) {
     for (const item of msg.M) {
       if (item.M === 'feed' && Array.isArray(item.A) && item.A.length >= 2)
         applyFeed(item.A[0], item.A[1]);
     }
   }
-  /* SignalR error response */
   if (msg.E) {
-    if (!hasData) showOverlay('Ошибка SignalR', msg.E, true);
+    showStatus('Ошибка SignalR · ' + msg.E);
+    if (!hasData) setPreloaderText('Ошибка SignalR · ' + msg.E);
   }
 }
 
@@ -426,12 +454,12 @@ function applyFeed(topic, data) {
   switch (topic) {
     case 'DriverList':
       S.drivers = merge(S.drivers, data);
-      if (Object.keys(S.drivers).length) { hasData = true; clearTimeout(noSessionTimer); hideOverlay(); }
+      if (Object.keys(S.drivers).length) { hasData = true; clearTimeout(noSessionTimer); hidePreloader(); clearStatus(); }
       renderTower();
       break;
     case 'TimingData':
       if (data.Lines) S.timing = merge(S.timing, data.Lines);
-      if (Object.keys(S.timing).length) { hasData = true; clearTimeout(noSessionTimer); hideOverlay(); }
+      if (Object.keys(S.timing).length) { hasData = true; clearTimeout(noSessionTimer); hidePreloader(); clearStatus(); }
       renderTower();
       break;
     case 'TimingAppData':
@@ -459,7 +487,6 @@ function applyFeed(topic, data) {
       }
       break;
     case 'ExtrapolatedClock':
-      /* could show remaining time — skip for now */
       break;
   }
 }
@@ -513,16 +540,13 @@ function renderTower() {
     else if (inPit) badge = '<span class="drv-badge pit">PIT</span>';
     else if (pitOut)badge = '<span class="drv-badge out">OUT</span>';
 
-    /* Gap */
     const isFirst = parseInt(t.Line) === 1;
     const gapVal  = isFirst ? '<span class="c-dim">—</span>' : (t.GapToLeader || '—');
 
-    /* Interval */
     const intObj  = t.IntervalToPositionAhead || {};
     const intVal  = intObj.Value || '—';
     const intCls  = intObj.Catching ? 'catching' : '';
 
-    /* Sectors */
     const secs = t.Sectors || {};
     function secTD(i, colCls) {
       const s = secs[String(i)] || {};
@@ -530,12 +554,10 @@ function renderTower() {
       return `<td class="${colCls} sec-cell ${v ? timeClass(s.Status) : 'c-dim'}">${v || '—'}</td>`;
     }
 
-    /* Last lap */
     const ll    = t.LastLapTime || {};
     const llVal = ll.Value || '—';
     const llCls = ll.Value ? timeClass(ll.Status) : 'c-dim';
 
-    /* Best lap */
     const bl    = t.BestLapTime || {};
     const blVal = bl.Value || '—';
 
@@ -571,14 +593,12 @@ const TRACK_MAP = {
 };
 
 function renderHeader() {
-  /* Session */
   const ev = document.getElementById('session-event');
   const st = document.getElementById('session-type');
   const mtg = S.session.Meeting;
   ev.textContent = (mtg && mtg.Name) ? mtg.Name : '—';
   st.textContent = S.session.Name || '';
 
-  /* Lap */
   const li = document.getElementById('lap-info');
   if (S.lap.CurrentLap) {
     li.textContent = S.lap.TotalLaps
@@ -586,7 +606,6 @@ function renderHeader() {
       : `Круг ${S.lap.CurrentLap}`;
   }
 
-  /* Track badge */
   const tb = document.getElementById('track-badge');
   const [cls, label] = TRACK_MAP[S.track.Status] || ['s-clear', S.track.Message || 'CLEAR'];
   tb.className = cls;
@@ -610,15 +629,19 @@ function renderRCM() {
 function setDot(cls) {
   document.getElementById('conn-dot').className = cls;
 }
-function showOverlay(title, sub, showOpen) {
-  const o = document.getElementById('overlay');
-  o.classList.remove('hidden');
-  document.getElementById('ov-title').textContent = title;
-  document.getElementById('ov-sub').textContent   = sub || '';
-  document.getElementById('ov-open').style.display = showOpen ? 'block' : 'none';
+function setPreloaderText(sub) {
+  document.getElementById('pl-sub').textContent = sub;
 }
-function hideOverlay() {
-  if (hasData) document.getElementById('overlay').classList.add('hidden');
+function hidePreloader() {
+  document.getElementById('preloader').classList.add('hidden');
+}
+function showStatus(msg) {
+  const bar = document.getElementById('status-bar');
+  bar.textContent = msg;
+  bar.classList.remove('hidden');
+}
+function clearStatus() {
+  document.getElementById('status-bar').classList.add('hidden');
 }
 
 /* ── RCM collapse toggle ── */
