@@ -348,7 +348,7 @@ function merge(tgt, src) {
 
 /* ── SignalR connection ── */
 let ws = null, keepAlive = null, reconnTimer = null, msgI = 1;
-let hasData = false, noSessionTimer = null;
+let hasData = false, noSessionTimer = null, msgCount = 0;
 
 async function connect() {
   setDot('connecting');
@@ -369,13 +369,20 @@ async function connect() {
     if (!hasData) {
       showOverlay('Подключено', 'Ожидание данных сессии…');
       noSessionTimer = setTimeout(() => {
-        if (!hasData) showOverlay('Нет активной сессии', 'Данные появятся когда начнётся практика, квалификация или гонка');
+        if (!hasData) {
+          if (msgCount === 0) {
+            showOverlay('Нет данных от F1', 'Сообщений не получено — проблема в воркере или сессии нет');
+          } else {
+            showOverlay('Данные получены, но не распознаны', `Сообщений: ${msgCount} · проверь консоль браузера`);
+          }
+        }
       }, 8000);
     }
     keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
   };
 
   ws.onmessage = e => {
+    msgCount++;
     try { handleMsg(JSON.parse(e.data)); } catch(_) {}
   };
 
