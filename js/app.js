@@ -198,8 +198,10 @@ function renderSuggestions(el, id) {
 
 // ── Panel factory ──────────────────────────────────────────────────────────
 
-const TELEMETRY_MARKER = '__telemetry__';
-const RACEPULSE_URL    = 'https://its-leha.github.io/RacePulse';
+const TELEMETRY_MARKER   = '__telemetry__';
+const LIVETIMING_MARKER  = '__livetiming__';
+const RACEPULSE_URL      = 'https://its-leha.github.io/RacePulse';
+const LIVETIMING_URL     = 'live-timing.html';
 
 function makePanel(id) {
     const el = document.createElement('div');
@@ -208,6 +210,8 @@ function makePanel(id) {
 
     if (state.videos[id] === TELEMETRY_MARKER) {
         renderTelemetry(el, id);
+    } else if (state.videos[id] === LIVETIMING_MARKER) {
+        renderLiveTiming(el, id);
     } else if (state.videos[id]) {
         const isYT = /youtube\.com|youtu\.be/.test(state.videos[id]);
         if (isYT) renderVideoPreview(el, id, state.videos[id]);
@@ -221,6 +225,27 @@ function makePanel(id) {
 function renderTelemetry(el, id) {
     el.innerHTML = `
         <iframe class="panel-video" src="${RACEPULSE_URL}"
+            allow="autoplay; fullscreen"
+            allowfullscreen
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+        <div class="panel-overlay">
+            <button class="overlay-btn" data-action="clear">Изменить</button>
+        </div>`;
+
+    el.querySelector('[data-action="clear"]').addEventListener('click', () => {
+        delete state.videos[id];
+        persist();
+        renderPlaceholder(el, id);
+        updateViewerClass();
+    });
+
+    updateViewerClass();
+}
+
+function renderLiveTiming(el, id) {
+    el.innerHTML = `
+        <iframe class="panel-video" src="${LIVETIMING_URL}"
             allow="autoplay; fullscreen"
             allowfullscreen
             referrerpolicy="no-referrer-when-downgrade">
@@ -255,6 +280,10 @@ function renderPlaceholder(el, id) {
                 <button class="telemetry-btn">
                     <img src="src/icon/RacePulse.svg" alt="">
                     RacePulse телеметрия
+                </button>
+                <button class="livetiming-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,15"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+                    F1 Live Timing
                 </button>
                 <button class="suggest-btn">
                     <img src="src/icon/star1.svg" alt="">
@@ -291,6 +320,12 @@ function renderPlaceholder(el, id) {
         state.videos[id] = TELEMETRY_MARKER;
         persist();
         renderTelemetry(el, id);
+    });
+
+    el.querySelector('.livetiming-btn').addEventListener('click', () => {
+        state.videos[id] = LIVETIMING_MARKER;
+        persist();
+        renderLiveTiming(el, id);
     });
 
     el.querySelector('.suggest-btn').addEventListener('click', () => {

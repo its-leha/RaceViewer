@@ -253,6 +253,33 @@ html, body {
 
 .telemetry-btn:hover img { opacity: 1; }
 
+.livetiming-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.12s, border-color 0.12s;
+}
+
+.livetiming-btn svg {
+    opacity: 0.6;
+    transition: opacity 0.12s;
+    flex-shrink: 0;
+}
+
+.livetiming-btn:hover {
+    background: var(--btn-hover);
+    border-color: #383838;
+}
+
+.livetiming-btn:hover svg { opacity: 1; }
+
 .suggest-btn {
     display: flex;
     align-items: center;
