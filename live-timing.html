@@ -361,7 +361,7 @@ async function connect() {
   } catch(e) {
     setDot('error');
     showOverlay('Ошибка WebSocket', e.message, true);
-    reconnTimer = setTimeout(connect, 6000);
+    reconnTimer = setTimeout(connect, 2000);
     return;
   }
 
@@ -392,7 +392,7 @@ async function connect() {
     setDot('error');
     const detail = e.reason ? `${e.code} · ${e.reason}` : `код ${e.code}`;
     if (!hasData) showOverlay('Соединение разорвано', `${detail} · повтор через 5 с`, true);
-    reconnTimer = setTimeout(connect, 5000);
+    reconnTimer = setTimeout(connect, 2000);
   };
 
   ws.onerror = () => {};
