@@ -361,7 +361,7 @@ async function connect() {
     const ac  = new AbortController();
     const tid = setTimeout(() => ac.abort(), 7000);
     const resp = await fetch(
-      'https://livetiming.formula1.com/signalr/negotiate?' +
+      'https://still-disk-17d0.hi-itsleha.workers.dev/?' +
       `connectionData=${encodeURIComponent(JSON.stringify([{name:'streaming'}]))}&clientProtocol=1.5&_=${Date.now()}`,
       { credentials: 'omit', signal: ac.signal }
     );
