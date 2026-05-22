@@ -303,6 +303,10 @@
   <div id="overlay">
     <span id="ov-title">Подключение к F1 Live Timing…</span>
     <span id="ov-sub">livetiming.formula1.com</span>
+    <a id="ov-open" href="live-timing.html" target="_blank"
+       style="display:none;margin-top:12px;font-size:11px;color:#505050;text-decoration:underline;cursor:pointer;">
+      Открыть отдельно ↗
+    </a>
   </div>
 
 </div>
@@ -348,41 +352,62 @@ let hasData = false;
 
 async function connect() {
   setDot('connecting');
+  clearTimeout(reconnTimer);
+  if (ws) { try { ws.close(); } catch(_) {} ws = null; }
+
+  // Step 1: negotiate (optional — may fail due to CORS, that's OK)
+  let token = null;
   try {
-    const neg = await fetch(
+    const ac  = new AbortController();
+    const tid = setTimeout(() => ac.abort(), 7000);
+    const resp = await fetch(
       'https://livetiming.formula1.com/signalr/negotiate?' +
-      `connectionData=${encodeURIComponent(JSON.stringify([{name:'Streaming'}]))}&clientProtocol=1.5&_=${Date.now()}`
-    ).then(r => r.json());
-
-    const token    = encodeURIComponent(neg.ConnectionToken);
-    const connData = encodeURIComponent(JSON.stringify([{name:'Streaming'}]));
-    const url = `wss://livetiming.formula1.com/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionToken=${token}&connectionData=${connData}`;
-
-    ws = new WebSocket(url);
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ H:'Streaming', M:'Subscribe', A:[TOPICS], I: msgI++ }));
-      setDot('connected');
-      keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
-    };
-
-    ws.onmessage = e => {
-      try { handleMsg(JSON.parse(e.data)); } catch(_) {}
-    };
-
-    ws.onclose = () => {
-      clearInterval(keepAlive);
-      setDot('error');
-      reconnTimer = setTimeout(connect, 5000);
-    };
-
-    ws.onerror = () => ws.close();
-
-  } catch(err) {
-    setDot('error');
-    showOverlay('Ошибка подключения', 'Повтор через 5 с…');
-    reconnTimer = setTimeout(connect, 5000);
+      `connectionData=${encodeURIComponent(JSON.stringify([{name:'streaming'}]))}&clientProtocol=1.5&_=${Date.now()}`,
+      { credentials: 'omit', signal: ac.signal }
+    );
+    clearTimeout(tid);
+    if (resp.ok) {
+      const neg = await resp.json();
+      token = neg.ConnectionToken || null;
+    }
+  } catch(e) {
+    // CORS or network — try WebSocket without token anyway
+    console.warn('[F1] negotiate skipped:', e.message);
   }
+
+  // Step 2: WebSocket (browsers don't apply CORS to WS upgrade)
+  const connData = encodeURIComponent(JSON.stringify([{name:'streaming'}]));
+  let wsUrl = `wss://livetiming.formula1.com/signalr/connect?transport=webSockets&clientProtocol=1.5&connectionData=${connData}`;
+  if (token) wsUrl += `&connectionToken=${encodeURIComponent(token)}`;
+
+  try {
+    ws = new WebSocket(wsUrl);
+  } catch(e) {
+    setDot('error');
+    showOverlay('Ошибка WebSocket', e.message);
+    reconnTimer = setTimeout(connect, 6000);
+    return;
+  }
+
+  ws.onopen = () => {
+    ws.send(JSON.stringify({ H:'streaming', M:'Subscribe', A:[TOPICS], I: msgI++ }));
+    setDot('connected');
+    if (!hasData) showOverlay('Подключено', 'Ожидание данных сессии…');
+    keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
+  };
+
+  ws.onmessage = e => {
+    try { handleMsg(JSON.parse(e.data)); } catch(_) {}
+  };
+
+  ws.onclose = e => {
+    clearInterval(keepAlive);
+    setDot('error');
+    if (!hasData) showOverlay('Соединение разорвано', `код ${e.code} · повтор через 5 с`, true);
+    reconnTimer = setTimeout(connect, 5000);
+  };
+
+  ws.onerror = () => { /* onclose fires after */ };
 }
 
 function handleMsg(msg) {
@@ -590,11 +615,12 @@ function renderRCM() {
 function setDot(cls) {
   document.getElementById('conn-dot').className = cls;
 }
-function showOverlay(title, sub) {
+function showOverlay(title, sub, showOpen) {
   const o = document.getElementById('overlay');
   o.classList.remove('hidden');
   document.getElementById('ov-title').textContent = title;
   document.getElementById('ov-sub').textContent   = sub || '';
+  document.getElementById('ov-open').style.display = showOpen ? 'block' : 'none';
 }
 function hideOverlay() {
   if (hasData) document.getElementById('overlay').classList.add('hidden');
@@ -607,11 +633,6 @@ document.getElementById('rcm-head').addEventListener('click', () => {
   const col  = wrap.classList.toggle('collapsed');
   tog.textContent = col ? '▸' : '▾';
 });
-
-/* ── No-data timeout: show "no active session" ── */
-setTimeout(() => {
-  if (!hasData) showOverlay('Нет активной сессии', 'Данные появятся когда начнётся сессия');
-}, 12000);
 
 connect();
 </script>
