@@ -230,6 +230,7 @@
     /* Lap times */
     .lap-cell  { min-width: 66px; font-weight: 600; }
     .best-cell { min-width: 66px; font-weight: 600; color: var(--dim); }
+    .best-mini { display: none; }
 
     .c-yellow { color: var(--yellow) !important; }
     .c-green  { color: var(--green)  !important; }
@@ -381,8 +382,17 @@
     #pl-sub { font-size: 11px; color: var(--dim); }
 
     /* ── Responsive ── */
-    @media (max-width: 560px) {
-      .col-s1, .col-s2, .col-s3, .col-best { display: none; }
+    @media (max-width: 600px) {
+      #app { zoom: 1; }
+      .drv-flag { display: none; }
+      td { padding: 4px 2px; }
+      thead th { padding: 4px 2px; }
+      thead th:first-child, tbody td:first-child { padding-left: 8px; }
+      thead th:last-child,  tbody td:last-child  { padding-right: 8px; }
+      .sec-mini { display: none; }
+      .sec-cell { min-width: 44px; }
+      .col-best { display: none; }
+      .best-mini { display: block; font-size: 9px; opacity: 0.8; }
     }
     @media (max-width: 400px) {
       .col-int, .col-status { display: none; }
@@ -705,7 +715,7 @@ function renderTower() {
       <td class="gap-cell">${gapVal}</td>
       <td class="int-cell col-int ${intCls}">${intVal}</td>
       ${secTD(0,'col-s1')}${secTD(1,'col-s2')}${secTD(2,'col-s3')}
-      <td class="lap-cell ${llCls}">${ll.Value || '—'}</td>
+      <td class="lap-cell ${llCls}">${ll.Value || '—'}<span class="best-mini">${bl.Value || '—'}</span></td>
       <td class="best-cell col-best">${bl.Value || '—'}</td>
     </tr>`;
   }
