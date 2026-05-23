@@ -229,6 +229,35 @@
     .c-purple { color: var(--purple) !important; }
     .c-dim    { color: var(--dim)    !important; }
 
+    /* ── Elimination zone ── */
+    tbody tr.row-elim { background: #4a1313 !important; }
+    tbody tr.row-elim:hover { background: #5c1818 !important; }
+    tr.elim-divider td {
+      background: #4a1313;
+      padding: 5px 16px;
+      border-top: 1px solid #7a2222;
+      border-bottom: none;
+    }
+    .elim-divider-inner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .elim-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .elim-session {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
     /* ── Race Control ── */
     #rcm-wrap {
       flex-shrink: 0;
@@ -514,6 +543,20 @@ function timeClass(status) {
   return '';
 }
 
+function getQualInfo() {
+  const name  = S.session.Name || '';
+  const lower = name.toLowerCase();
+  if (!lower.includes('qualifying')) return null;
+  const sprint = lower.includes('sprint');
+  if (lower.includes('1')) return { cutoff: 16, label: sprint ? 'SQ1' : 'Q1' };
+  if (lower.includes('2')) return { cutoff: 11, label: sprint ? 'SQ2' : 'Q2' };
+  if (lower.includes('3')) return { cutoff: null, label: sprint ? 'SQ3' : 'Q3' };
+  const total = Object.keys(S.timing).length;
+  if (total > 15) return { cutoff: 16, label: 'Q1' };
+  if (total > 10) return { cutoff: 11, label: 'Q2' };
+  return { cutoff: null, label: 'Q3' };
+}
+
 function renderTower() {
   const tbody = document.getElementById('tbody');
   if (!tbody) return;
@@ -522,6 +565,9 @@ function renderTower() {
     .map(([num, t]) => ({ num, t, d: S.drivers[num] || {} }))
     .filter(r => r.t && r.t.Line != null)
     .sort((a, b) => (parseInt(a.t.Line) || 99) - (parseInt(b.t.Line) || 99));
+
+  const qi = getQualInfo();
+  let dividerInserted = false;
 
   let html = '';
   for (const { num, t, d } of rows) {
@@ -591,7 +637,23 @@ function renderTower() {
     const llCls = ll.Value ? timeClass(ll.Status) : 'c-dim';
     const bl    = t.BestLapTime || {};
 
-    html += `<tr class="${retired ? 'row-retired' : ''}">
+    /* Elimination zone divider */
+    const linePos = parseInt(t.Line) || 99;
+    if (qi && qi.cutoff && !dividerInserted && linePos >= qi.cutoff) {
+      html += `<tr class="elim-divider">
+        <td colspan="11">
+          <div class="elim-divider-inner">
+            <span class="elim-label">Elimination zone</span>
+            <span class="elim-session">${qi.label}</span>
+          </div>
+        </td>
+      </tr>`;
+      dividerInserted = true;
+    }
+
+    const inElim = !!(qi && ((qi.cutoff && linePos >= qi.cutoff) || t.KnockedOut));
+
+    html += `<tr class="${retired ? 'row-retired' : ''} ${inElim ? 'row-elim' : ''}">
       <td class="pos-cell l">${pos}</td>
       <td class="l">${driverCell}</td>
       <td class="status-col col-status">${statusHTML}</td>
