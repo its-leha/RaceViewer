@@ -615,9 +615,10 @@ function renderTower() {
 
   let html = '';
   for (const { num, t, d } of rows) {
-    const retired = !!t.Retired;
-    const inPit   = !!t.InPit;
-    const pitOut  = !!t.PitOut;
+    const cs     = t._c && t._c.status != null ? t._c.status : null;
+    const retired = cs ? cs === 'Retired' : !!t.Retired;
+    const inPit   = cs ? cs === 'InPit'   : !!t.InPit;
+    const pitOut  = cs ? cs === 'PitOut'  : !!t.PitOut;
     const pos     = t.ShowPosition === false ? '' : (t.Line || '');
     const tla     = d.Tla || num;
     const country = DRIVER_COUNTRY[tla] || '';
