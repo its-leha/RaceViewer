@@ -145,7 +145,17 @@
 
     /* Driver */
     .drv-cell { display: flex; align-items: center; gap: 5px; }
-    .drv-logo { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; object-fit: contain; background: #1b1b1b; }
+    .drv-logo-bg {
+      width: 20px; height: 20px;
+      border-radius: 4px;
+      background: #1b1b1b;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .drv-logo { width: 20px; height: 20px; object-fit: contain; }
     .drv-tla  {
       font-weight: 700;
       font-size: 12px;
@@ -518,7 +528,7 @@ function renderTower() {
     const logoSrc = `src/timing-icons/driver-logo/Property 1=${tla}.svg`;
     const flagSrc = country ? `src/timing-icons/flags/Property 1=${country}.svg` : '';
     const driverCell = `<div class="drv-cell">
-      <img class="drv-logo" src="${logoSrc}" alt="${tla}" onerror="this.style.display='none'">
+      <div class="drv-logo-bg"><img class="drv-logo" src="${logoSrc}" alt="${tla}" onerror="this.parentElement.style.display='none'"></div>
       <span class="drv-tla">${tla}</span>
       ${flagSrc ? `<img class="drv-flag" src="${flagSrc}" alt="${country}" onerror="this.style.display='none'">` : ''}
     </div>`;
