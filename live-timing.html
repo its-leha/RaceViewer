@@ -99,9 +99,16 @@
     /* ── Timing tower ── */
     #tower-wrap {
       flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 0;
+    }
+    #table-scroll {
       overflow-y: auto;
       overflow-x: hidden;
-      min-height: 0;
+      max-height: calc(100% - 160px);
+      flex-shrink: 0;
     }
     table {
       width: 100%;
@@ -262,6 +269,10 @@
     #rcm-wrap {
       border-top: 1px solid var(--border);
       background: var(--bg2);
+      flex: 1;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
     }
     #rcm-head {
       display: flex;
@@ -298,8 +309,9 @@
     #rcm-list {
       display: flex;
       flex-direction: column;
-      max-height: 160px;
+      flex: 1;
       overflow-y: auto;
+      min-height: 0;
     }
     #rcm-list::-webkit-scrollbar { width: 3px; }
     #rcm-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
@@ -308,7 +320,7 @@
       display: flex;
       align-items: flex-start;
       gap: 8px;
-      padding: 5px 12px;
+      padding: 8px 16px 8px 12px;
       border-bottom: 1px solid #141414;
     }
     .rcm-icon { width: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding-top: 1px; }
@@ -388,6 +400,7 @@
   </div>
 
   <div id="tower-wrap">
+    <div id="table-scroll">
     <table>
       <thead>
         <tr>
@@ -406,6 +419,7 @@
       </thead>
       <tbody id="tbody"></tbody>
     </table>
+    </div>
 
     <div id="rcm-wrap">
       <div id="rcm-head">
