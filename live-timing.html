@@ -469,6 +469,7 @@ const S = {
   lap:       {},
   rcm:       [],
 };
+const tyreCache = {}; // num → last known non-null Compound
 
 function merge(tgt, src) {
   if (src === null || typeof src !== 'object' || Array.isArray(src)) return src;
@@ -641,8 +642,9 @@ function renderTower() {
     if (app && app.Stints) {
       const stints = Object.values(app.Stints);
       if (stints.length) {
-        const last     = stints[stints.length - 1];
-        const compound = (last.Compound || 'null').toLowerCase();
+        const last = stints[stints.length - 1];
+        if (last.Compound) tyreCache[num] = last.Compound;
+        const compound = (tyreCache[num] || 'null').toLowerCase();
         const age      = last.TotalLaps != null ? last.TotalLaps : '';
         tyreCell = `<div class="tyre-wrap">
           <img class="tyre-icon" src="src/timing-icons/tires/Property 1=${compound}.svg" alt="${compound}" onerror="this.style.display='none'">
