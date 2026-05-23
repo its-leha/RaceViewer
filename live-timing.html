@@ -241,28 +241,29 @@
     tbody tr.row-elim:hover { background: #5c1818 !important; }
     tr.elim-divider td {
       background: #4a1313;
-      padding: 5px 16px;
-      border-top: 1px solid #7a2222;
-      border-bottom: none;
+      padding: 8px 14px 4px;
+      border-bottom: 0.8px solid #181818;
     }
     .elim-divider-inner {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
+    .elim-chevron { opacity: 0.65; flex-shrink: 0; }
     .elim-label {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      color: rgba(255,255,255,0.9);
+      color: #fff;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.07em;
     }
+    .elim-sep { color: rgba(255,255,255,0.4); font-size: 11px; }
     .elim-session {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
-      color: rgba(255,255,255,0.35);
+      color: #fff;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.07em;
     }
 
     /* ── Race Control ── */
@@ -684,7 +685,11 @@ function renderTower() {
       html += `<tr class="elim-divider">
         <td colspan="11">
           <div class="elim-divider-inner">
+            <svg class="elim-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="4 8 12 16 20 8"/><polyline points="4 14 12 22 20 14"/>
+            </svg>
             <span class="elim-label">Elimination zone</span>
+            <span class="elim-sep">—</span>
             <span class="elim-session">${qi.label}</span>
           </div>
         </td>
