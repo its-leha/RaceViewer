@@ -260,11 +260,8 @@
 
     /* ── Race Control ── */
     #rcm-wrap {
-      flex-shrink: 0;
       border-top: 1px solid var(--border);
       background: var(--bg2);
-      max-height: 110px;
-      overflow-y: auto;
     }
     #rcm-head {
       display: flex;
@@ -380,14 +377,14 @@
       </thead>
       <tbody id="tbody"></tbody>
     </table>
-  </div>
 
-  <div id="rcm-wrap">
-    <div id="rcm-head">
-      <span>Race Control</span>
-      <span id="rcm-toggle">▾</span>
+    <div id="rcm-wrap">
+      <div id="rcm-head">
+        <span>Race Control</span>
+        <span id="rcm-toggle">▾</span>
+      </div>
+      <div id="rcm-list"></div>
     </div>
-    <div id="rcm-list"></div>
   </div>
 
   <div id="status-bar" class="hidden"></div>
