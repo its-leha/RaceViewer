@@ -88,6 +88,14 @@
       white-space: nowrap;
       flex-shrink: 0;
     }
+    #session-clock {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--dim);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
     #lap-info {
       font-size: 11px;
       color: var(--dim);
@@ -397,6 +405,7 @@
     <span id="session-event">—</span>
     <span id="track-badge" class="s-clear">CLEAR</span>
     <span id="session-type"></span>
+    <span id="session-clock"></span>
     <span id="lap-info"></span>
   </div>
 
@@ -471,6 +480,7 @@ const S = {
 };
 const tyreCache = {}; // num → last known non-null Compound
 const intCache  = {}; // num → previous interval float (for catching detection)
+let clockData   = null; // { remaining: secs, utcMs: ms, extrapolating: bool }
 
 function merge(tgt, src) {
   if (src === null || typeof src !== 'object' || Array.isArray(src)) return src;
@@ -489,6 +499,35 @@ function merge(tgt, src) {
 
 let ws = null, keepAlive = null, reconnTimer = null;
 let hasData = false, noSessionTimer = null, msgCount = 0;
+
+function parseRemaining(str) {
+  if (!str) return null;
+  const parts = str.split(':').map(Number);
+  if (parts.some(isNaN)) return null;
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return null;
+}
+
+function formatTime(secs) {
+  if (secs == null || secs < 0) secs = 0;
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = Math.floor(secs % 60);
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function renderClock() {
+  const el = document.getElementById('session-clock');
+  if (!el || !clockData) { if (el) el.textContent = ''; return; }
+  let secs = clockData.remaining;
+  if (clockData.extrapolating) {
+    const elapsed = (Date.now() - clockData.utcMs) / 1000;
+    secs = Math.max(0, clockData.remaining - elapsed);
+  }
+  el.textContent = formatTime(Math.round(secs));
+}
 
 async function connect() {
   setDot('connecting');
@@ -568,6 +607,18 @@ function applyFeed(topic, data) {
     case 'TrackStatus':  S.track = Object.assign({}, S.track, data); renderHeader(); break;
     case 'LapCount':     S.lap   = Object.assign({}, S.lap,   data); renderHeader(); break;
     case 'SessionInfo':  S.session = merge(S.session, data);         renderHeader(); break;
+    case 'ExtrapolatedClock': {
+      const rem = parseRemaining(data.Remaining);
+      if (rem != null) {
+        clockData = {
+          remaining:    rem,
+          utcMs:        data.Utc ? new Date(data.Utc).getTime() : Date.now(),
+          extrapolating: !!data.Extrapolating,
+        };
+        renderClock();
+      }
+      break;
+    }
     case 'RaceControlMessages':
       if (data.Messages) {
         const msgs = Object.values(data.Messages).sort((a,b) => (a.Utc > b.Utc ? -1 : 1));
@@ -674,7 +725,7 @@ function renderTower() {
     function secTD(i, colCls) {
       const s    = secs[String(i)] || {};
       const v    = s.Value || '';
-      const prev = s.PreviousValue || '';
+      const prev = (s.PreviousValue && s.PreviousValue !== v) ? s.PreviousValue : '';
       const status = (t._c && t._c['s' + i] != null) ? t._c['s' + i] : s.Status;
       const cls  = v ? timeClass(status) : '';
       return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
@@ -739,10 +790,13 @@ function renderHeader() {
   document.getElementById('session-type').textContent  = S.session.Name || '';
 
   const li = document.getElementById('lap-info');
-  if (S.lap.CurrentLap)
+  const isRace = !(S.session.Name || '').toLowerCase().includes('qualifying');
+  if (isRace && S.lap.CurrentLap)
     li.textContent = S.lap.TotalLaps
       ? `Круг ${S.lap.CurrentLap} / ${S.lap.TotalLaps}`
       : `Круг ${S.lap.CurrentLap}`;
+  else if (!isRace)
+    li.textContent = '';
 
   const tb = document.getElementById('track-badge');
   const [cls, label] = TRACK_MAP[S.track.Status] || ['s-clear', S.track.Message || 'CLEAR'];
@@ -838,6 +892,7 @@ document.getElementById('rcm-translate-btn').addEventListener('click', e => {
   }
 });
 
+setInterval(renderClock, 1000);
 connect();
 
 // Debug helper: _f1d(racing_number) e.g. _f1d(1) or _f1d(44)
