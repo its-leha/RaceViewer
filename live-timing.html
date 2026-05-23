@@ -470,6 +470,7 @@ const S = {
   rcm:       [],
 };
 const tyreCache = {}; // num → last known non-null Compound
+const intCache  = {}; // num → previous interval float (for catching detection)
 
 function merge(tgt, src) {
   if (src === null || typeof src !== 'object' || Array.isArray(src)) return src;
@@ -656,9 +657,16 @@ function renderTower() {
     /* Gap / Interval */
     const isFirst = parseInt(t.Line) === 1;
     const gapVal  = isFirst ? '<span class="c-dim">—</span>' : (t.GapToLeader || '—');
-    const intObj  = t.IntervalToPositionAhead || {};
-    const intVal  = intObj.Value || '—';
-    const intCls  = intObj.Catching ? 'catching' : '';
+    const intObj   = t.IntervalToPositionAhead || {};
+    const intVal   = intObj.Value || '—';
+    const intFloat = parseFloat(intVal);
+    let catching   = !!intObj.Catching;
+    if (!catching && !isNaN(intFloat)) {
+      const prev = intCache[num];
+      if (prev != null && intFloat < prev) catching = true;
+    }
+    if (!isNaN(intFloat)) intCache[num] = intFloat;
+    const intCls = catching ? 'catching' : '';
 
     /* Sectors */
     const secs = t.Sectors || {};
