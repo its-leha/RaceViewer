@@ -280,6 +280,21 @@
     }
     #rcm-head:hover { color: var(--text); }
     #rcm-toggle { margin-left: auto; font-size: 10px; }
+    #rcm-translate-btn {
+      background: none;
+      border: 0.8px solid var(--dim);
+      color: var(--dim);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 1px 5px;
+      border-radius: 2px;
+      cursor: pointer;
+      margin-left: 6px;
+      text-transform: uppercase;
+    }
+    #rcm-translate-btn:hover { color: var(--text); border-color: var(--text); }
+    #rcm-translate-btn.active { color: var(--yellow); border-color: var(--yellow); }
     #rcm-list { display: flex; flex-direction: column; }
     .rcm-row {
       display: flex;
@@ -381,6 +396,7 @@
     <div id="rcm-wrap">
       <div id="rcm-head">
         <span>Race Control</span>
+        <button id="rcm-translate-btn" title="Перевести на русский">RU</button>
         <span id="rcm-toggle">▾</span>
       </div>
       <div id="rcm-list"></div>
@@ -690,15 +706,47 @@ function renderHeader() {
   tb.textContent = label;
 }
 
+/* ── Translation ── */
+let translateEnabled = false;
+const translateCache = new Map();
+
+async function translateText(text) {
+  if (!text) return text;
+  if (translateCache.has(text)) return translateCache.get(text);
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ru&dt=t&q=${encodeURIComponent(text)}`;
+    const r    = await fetch(url);
+    const data = await r.json();
+    const out  = data[0].map(i => i[0]).filter(Boolean).join('');
+    translateCache.set(text, out);
+    return out;
+  } catch(_) { return text; }
+}
+
+async function translateVisibleRCM() {
+  if (!translateEnabled) return;
+  const els = document.querySelectorAll('.rcm-msg[data-orig]');
+  for (const el of els) {
+    if (el.dataset.done) continue;
+    const translated = await translateText(el.dataset.orig);
+    if (!translateEnabled) break;
+    el.textContent  = translated;
+    el.dataset.done = '1';
+  }
+}
+
 function renderRCM() {
+  function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   document.getElementById('rcm-list').innerHTML = S.rcm.slice(0, 15).map(m => {
     const ts   = (m.Utc || '').slice(11, 16);
     const flag = m.Flag ? `flag-${m.Flag}` : '';
+    const text = m.Message || '';
     return `<div class="rcm-row ${flag}">
       <span class="rcm-ts">${ts}</span>
-      <span class="rcm-msg">${m.Message || ''}</span>
+      <span class="rcm-msg" data-orig="${esc(text)}">${text}</span>
     </div>`;
   }).join('');
+  if (translateEnabled) translateVisibleRCM();
 }
 
 function setDot(cls)           { document.getElementById('conn-dot').className = cls; }
@@ -712,6 +760,20 @@ document.getElementById('rcm-head').addEventListener('click', () => {
   const tog  = document.getElementById('rcm-toggle');
   const col  = wrap.classList.toggle('collapsed');
   tog.textContent = col ? '▸' : '▾';
+});
+
+document.getElementById('rcm-translate-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  translateEnabled = !translateEnabled;
+  document.getElementById('rcm-translate-btn').classList.toggle('active', translateEnabled);
+  if (translateEnabled) {
+    translateVisibleRCM();
+  } else {
+    document.querySelectorAll('.rcm-msg[data-orig]').forEach(el => {
+      el.textContent = el.dataset.orig;
+      delete el.dataset.done;
+    });
+  }
 });
 
 connect();
