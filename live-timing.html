@@ -12,8 +12,8 @@
       --text:   #c0c0c0;
       --dim:    #505050;
       --faint:  #2a2a2a;
-      --green:  #2ec92e;
-      --purple: #b060ff;
+      --green:  #4ade80;
+      --purple: #9747ff;
       --yellow: #e0b800;
       --red:    #e03030;
       --orange: #e08030;
@@ -194,23 +194,28 @@
     .int-cell.catching { color: var(--green); }
 
     /* Sectors */
-    .sec-cell { min-width: 58px; padding: 0; }
+    .sec-cell { min-width: 64px; padding: 0; }
     .sec-wrap {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 3px;
-      padding: 4px 6px 4px 8px;
+      gap: 2px;
+      padding: 8px 6px 6px 12px;
     }
     .sec-bar {
-      width: 20px; height: 3px;
-      border-radius: 1.5px;
+      height: 4px;
+      border-radius: 2px;
       background: var(--faint);
     }
     .sec-bar.c-yellow { background: var(--yellow); }
     .sec-bar.c-green  { background: var(--green); }
     .sec-bar.c-purple { background: var(--purple); }
-    .sec-val { font-size: 10px; color: var(--dim); }
+    .sec-times {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sec-mini { font-size: 6px; font-weight: 500; color: #c0c0c0; }
+    .sec-val  { font-size: 10px; font-weight: 500; color: var(--dim); }
     .sec-val.c-yellow { color: var(--yellow); }
     .sec-val.c-green  { color: var(--green); }
     .sec-val.c-purple { color: var(--purple); }
@@ -568,12 +573,16 @@ function renderTower() {
     /* Sectors */
     const secs = t.Sectors || {};
     function secTD(i, colCls) {
-      const s   = secs[String(i)] || {};
-      const v   = s.Value || '';
-      const cls = v ? timeClass(s.Status) : '';
+      const s    = secs[String(i)] || {};
+      const v    = s.Value || '';
+      const prev = s.PreviousValue || '';
+      const cls  = v ? timeClass(s.Status) : '';
       return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
         <span class="sec-bar ${cls}"></span>
-        <span class="sec-val ${cls}">${v || '—'}</span>
+        <div class="sec-times">
+          <span class="sec-mini">${prev}</span>
+          <span class="sec-val ${cls}">${v || '—'}</span>
+        </div>
       </div></td>`;
     }
 
