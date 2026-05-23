@@ -295,20 +295,34 @@
     }
     #rcm-translate-btn:hover { color: var(--text); border-color: var(--text); }
     #rcm-translate-btn.active { color: var(--yellow); border-color: var(--yellow); }
-    #rcm-list { display: flex; flex-direction: column; }
+    #rcm-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    #rcm-list::-webkit-scrollbar { width: 3px; }
+    #rcm-list::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+    #rcm-list::-webkit-scrollbar-track { background: transparent; }
     .rcm-row {
       display: flex;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 8px;
       padding: 5px 12px;
       border-bottom: 1px solid #141414;
     }
-    .rcm-ts  { color: #383838; font-size: 10px; flex-shrink: 0; min-width: 38px; }
+    .rcm-icon { width: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding-top: 1px; }
+    .rcm-badge { font-size: 7px; font-weight: 700; letter-spacing: 0; border: 0.8px solid; border-radius: 2px; padding: 1px 2px; line-height: 1; }
+    .rcm-ts  { color: #383838; font-size: 10px; flex-shrink: 0; min-width: 34px; padding-top: 1px; }
     .rcm-msg { flex: 1; color: #9a9a9a; font-size: 11px; line-height: 1.3; }
-    .rcm-row.flag-YELLOW .rcm-msg { color: var(--yellow); }
-    .rcm-row.flag-RED    .rcm-msg { color: var(--red); }
-    .rcm-row.flag-GREEN  .rcm-msg { color: var(--green); }
-    .rcm-row.flag-SC     .rcm-msg { color: var(--orange); }
-    .rcm-row.flag-VSC    .rcm-msg { color: var(--orange); }
+    .rcm-row.flag-YELLOW       .rcm-msg { color: var(--yellow); }
+    .rcm-row.flag-DOUBLE-YELLOW .rcm-msg { color: var(--yellow); }
+    .rcm-row.flag-RED          .rcm-msg { color: var(--red); }
+    .rcm-row.flag-GREEN        .rcm-msg { color: var(--green); }
+    .rcm-row.flag-CLEAR        .rcm-msg { color: var(--green); }
+    .rcm-row.flag-SC           .rcm-msg { color: var(--orange); }
+    .rcm-row.flag-VSC          .rcm-msg { color: var(--orange); }
+    .rcm-row.flag-BLUE         .rcm-msg { color: #5090f0; }
     #rcm-wrap.collapsed #rcm-list { display: none; }
 
     /* ── Status bar ── */
@@ -735,17 +749,35 @@ async function translateVisibleRCM() {
   }
 }
 
+function rcmIcon(flag) {
+  const f = (flag || '').toUpperCase().replace(/\s+/g, '_');
+  const fl = (color) =>
+    `<svg width="11" height="13" viewBox="0 0 11 13" fill="none"><line x1="2" y1="0" x2="2" y2="13" stroke="${color}" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="1" width="8" height="8" rx="0.5" fill="${color}"/></svg>`;
+  if (f === 'YELLOW' || f === 'DOUBLE_YELLOW') return fl('#e0b800');
+  if (f === 'RED')   return fl('#e03030');
+  if (f === 'GREEN' || f === 'CLEAR') return fl('#4ade80');
+  if (f === 'BLUE')  return fl('#5090f0');
+  if (f === 'CHEQUERED') return `<svg width="11" height="13" viewBox="0 0 11 13" fill="none"><line x1="2" y1="0" x2="2" y2="13" stroke="#888" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="1" width="4" height="4" fill="#ccc"/><rect x="7" y="1" width="4" height="4" fill="#555"/><rect x="3" y="5" width="4" height="4" fill="#555"/><rect x="7" y="5" width="4" height="4" fill="#ccc"/></svg>`;
+  if (f === 'SC')  return `<span class="rcm-badge" style="color:var(--orange);border-color:var(--orange)">SC</span>`;
+  if (f === 'VSC') return `<span class="rcm-badge" style="color:var(--orange);border-color:var(--orange)">VSC</span>`;
+  return '';
+}
+
 function renderRCM() {
   function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  document.getElementById('rcm-list').innerHTML = S.rcm.slice(0, 15).map(m => {
+  const list = document.getElementById('rcm-list');
+  list.innerHTML = S.rcm.map(m => {
     const ts   = (m.Utc || '').slice(11, 16);
-    const flag = m.Flag ? `flag-${m.Flag}` : '';
+    const flag = m.Flag ? `flag-${m.Flag.replace(/\s+/g, '-')}` : '';
     const text = m.Message || '';
+    const icon = rcmIcon(m.Flag);
     return `<div class="rcm-row ${flag}">
+      <span class="rcm-icon">${icon}</span>
       <span class="rcm-ts">${ts}</span>
       <span class="rcm-msg" data-orig="${esc(text)}">${text}</span>
     </div>`;
   }).join('');
+  list.scrollTop = 0;
   if (translateEnabled) translateVisibleRCM();
 }
 
