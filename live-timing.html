@@ -8,7 +8,6 @@
     :root {
       --bg:     #0d0d0d;
       --bg2:    #0a0a0a;
-      --surf:   #111;
       --border: #232323;
       --text:   #c0c0c0;
       --dim:    #505050;
@@ -47,16 +46,15 @@
       overflow: hidden;
     }
     #conn-dot {
-      width: 6px;
-      height: 6px;
+      width: 6px; height: 6px;
       border-radius: 50%;
       flex-shrink: 0;
       background: var(--faint);
       transition: background 0.3s;
     }
-    #conn-dot.connected    { background: var(--green); }
-    #conn-dot.connecting   { background: var(--yellow); animation: pulse 1s infinite; }
-    #conn-dot.error        { background: var(--red); }
+    #conn-dot.connected  { background: var(--green); }
+    #conn-dot.connecting { background: var(--yellow); animation: pulse 1s infinite; }
+    #conn-dot.error      { background: var(--red); }
     @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
     #session-event {
@@ -67,21 +65,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       min-width: 0;
-    }
-    #session-type {
-      font-size: 10px;
-      color: var(--dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    #lap-info {
-      font-size: 11px;
-      color: var(--dim);
-      white-space: nowrap;
-      flex-shrink: 0;
-      margin-left: auto;
     }
     #track-badge {
       font-size: 9px;
@@ -97,6 +80,21 @@
     #track-badge.s-red    { background:#240000; color:var(--red); }
     #track-badge.s-sc     { background:#241000; color:var(--orange); }
     #track-badge.s-vsc    { background:#1a1000; color:var(--orange); }
+    #session-type {
+      font-size: 10px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #lap-info {
+      font-size: 11px;
+      color: var(--dim);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
 
     /* ── Timing tower ── */
     #tower-wrap {
@@ -108,7 +106,6 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
       font-variant-numeric: tabular-nums;
     }
     thead th {
@@ -118,10 +115,10 @@
       z-index: 2;
       color: var(--dim);
       font-size: 9px;
-      font-weight: 400;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.09em;
-      padding: 4px 5px;
+      padding: 4px 6px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
       text-align: right;
@@ -131,64 +128,88 @@
 
     tbody tr { border-bottom: 1px solid #181818; }
     tbody tr:hover { background: #131313; }
-    tbody tr.row-retired { opacity: 0.3; }
+    tbody tr.row-retired { opacity: 0.35; }
 
     td {
-      padding: 5px 5px;
+      padding: 4px 6px;
       white-space: nowrap;
       text-align: right;
       vertical-align: middle;
       color: var(--text);
+      font-size: 11px;
     }
     td.l { text-align: left; }
 
-    .pos-cell { color: var(--dim); font-size: 11px; width: 22px; }
-    .num-cell { font-size: 11px; color: var(--dim); width: 26px; }
+    /* Position */
+    .pos-cell { color: var(--dim); width: 22px; text-align: center; }
 
+    /* Driver */
     .drv-cell { display: flex; align-items: center; gap: 5px; }
-    .drv-bar  {
-      width: 3px;
-      height: 15px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    .drv-tla {
+    .drv-logo { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; object-fit: contain; }
+    .drv-tla  {
       font-weight: 700;
       font-size: 12px;
       letter-spacing: 0.03em;
       color: #d8d8d8;
     }
-    .drv-badge {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-    }
-    .drv-badge.pit  { color: var(--orange); }
-    .drv-badge.out  { color: var(--green); }
-    .drv-badge.stop { color: var(--red); }
+    .drv-flag { width: 12px; height: 12px; border-radius: 20px; flex-shrink: 0; object-fit: cover; }
 
-    .gap-cell { min-width: 52px; }
-    .int-cell { min-width: 48px; color: var(--dim); }
+    /* Status */
+    .status-col { width: 68px; text-align: center; }
+    .status-badge {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      padding: 2px 5px;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .status-pit { color: #bebebe; border: 0.4px solid rgba(190,190,190,0.5); background: rgba(190,190,190,0.07); }
+    .status-out { color: var(--green); border: 0.4px solid rgba(46,201,46,0.5); background: rgba(46,201,46,0.07); }
+    .status-dnf { color: var(--red);   border: 0.4px solid rgba(224,48,48,0.5); background: rgba(224,48,48,0.07); }
+
+    /* Tyre */
+    .tyre-cell { width: 52px; }
+    .tyre-wrap { display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
+    .tyre-icon { width: 16px; height: 16px; flex-shrink: 0; }
+    .tyre-age  { font-size: 10px; font-weight: 600; color: #d2d2d2; }
+
+    /* Gap / Interval */
+    .gap-cell { min-width: 54px; font-weight: 600; color: var(--dim); }
+    .int-cell { min-width: 50px; font-weight: 600; color: var(--dim); }
     .int-cell.catching { color: var(--green); }
 
-    .sec-cell { min-width: 44px; }
-    .lap-cell { min-width: 54px; }
-    .best-cell { min-width: 54px; color: var(--dim); }
+    /* Sectors */
+    .sec-cell { min-width: 58px; padding: 0; }
+    .sec-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      padding: 4px 6px 4px 8px;
+    }
+    .sec-bar {
+      width: 20px; height: 3px;
+      border-radius: 1.5px;
+      background: var(--faint);
+    }
+    .sec-bar.c-yellow { background: var(--yellow); }
+    .sec-bar.c-green  { background: var(--green); }
+    .sec-bar.c-purple { background: var(--purple); }
+    .sec-val { font-size: 10px; color: var(--dim); }
+    .sec-val.c-yellow { color: var(--yellow); }
+    .sec-val.c-green  { color: var(--green); }
+    .sec-val.c-purple { color: var(--purple); }
+
+    /* Lap times */
+    .lap-cell  { min-width: 66px; font-weight: 600; }
+    .best-cell { min-width: 66px; font-weight: 600; color: var(--dim); }
 
     .c-yellow { color: var(--yellow) !important; }
     .c-green  { color: var(--green)  !important; }
     .c-purple { color: var(--purple) !important; }
     .c-dim    { color: var(--dim)    !important; }
-
-    /* Tyre */
-    .tyre-cell { min-width: 36px; }
-    .tyre-lbl  { font-weight: 700; font-size: 11px; }
-    .tyre-age  { font-size: 10px; color: var(--dim); margin-left: 2px; }
-    .tyre-S { color: #e04040; }
-    .tyre-M { color: #d4b000; }
-    .tyre-H { color: #d0d0d0; }
-    .tyre-I { color: #44b844; }
-    .tyre-W { color: #4488e0; }
 
     /* ── Race Control ── */
     #rcm-wrap {
@@ -202,9 +223,10 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-bottom: 1px solid var(--border);
       font-size: 9px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--dim);
@@ -217,13 +239,12 @@
     #rcm-list { display: flex; flex-direction: column; }
     .rcm-row {
       display: flex;
-      gap: 8px;
-      padding: 4px 10px;
+      gap: 10px;
+      padding: 5px 12px;
       border-bottom: 1px solid #141414;
-      font-size: 11px;
     }
     .rcm-ts  { color: #383838; font-size: 10px; flex-shrink: 0; min-width: 38px; }
-    .rcm-msg { flex: 1; color: var(--dim); line-height: 1.3; }
+    .rcm-msg { flex: 1; color: #9a9a9a; font-size: 11px; line-height: 1.3; }
     .rcm-row.flag-YELLOW .rcm-msg { color: var(--yellow); }
     .rcm-row.flag-RED    .rcm-msg { color: var(--red); }
     .rcm-row.flag-GREEN  .rcm-msg { color: var(--green); }
@@ -273,20 +294,18 @@
     }
     #pl-sub { font-size: 11px; color: var(--dim); }
 
-    /* ── Narrow panel adjustments ── */
-    @media (max-width: 520px) {
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
       .col-s1, .col-s2, .col-s3, .col-best { display: none; }
     }
-    @media (max-width: 380px) {
-      .col-int { display: none; }
-      .num-cell { display: none; }
+    @media (max-width: 400px) {
+      .col-int, .col-status { display: none; }
     }
   </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Session bar -->
   <div id="session-bar">
     <span id="conn-dot" class="connecting"></span>
     <span id="session-event">—</span>
@@ -295,29 +314,27 @@
     <span id="lap-info"></span>
   </div>
 
-  <!-- Timing tower -->
   <div id="tower-wrap">
     <table>
       <thead>
         <tr>
           <th class="l">P</th>
-          <th class="l">#</th>
           <th class="l">Водитель</th>
+          <th class="col-status">Состояние</th>
+          <th class="col-tyre">Резина</th>
           <th>Гэп</th>
           <th class="col-int">Инт</th>
-          <th class="col-s1 sec-cell">S1</th>
-          <th class="col-s2 sec-cell">S2</th>
-          <th class="col-s3 sec-cell">S3</th>
+          <th class="col-s1">S1</th>
+          <th class="col-s2">S2</th>
+          <th class="col-s3">S3</th>
           <th>Круг</th>
           <th class="col-best">Лучший</th>
-          <th>Рез</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
 
-  <!-- Race Control messages -->
   <div id="rcm-wrap">
     <div id="rcm-head">
       <span>Race Control</span>
@@ -326,10 +343,8 @@
     <div id="rcm-list"></div>
   </div>
 
-  <!-- Status bar (errors) -->
   <div id="status-bar" class="hidden"></div>
 
-  <!-- Preloader -->
   <div id="preloader">
     <div class="pl-dots"><span></span><span></span><span></span></div>
     <span id="pl-sub">Подключение к F1 Live Timing…</span>
@@ -345,18 +360,27 @@ const TOPICS = [
   'RaceControlMessages', 'ExtrapolatedClock',
 ];
 
-/* ── State ── */
-const S = {
-  drivers:    {},
-  timing:     {},
-  appTiming:  {},
-  session:    {},
-  track:      { Status: '1', Message: 'AllClear' },
-  lap:        {},
-  rcm:        [],
+const DRIVER_COUNTRY = {
+  ALB: 'Thailand',       ALO: 'Spain',          ANT: 'Italy',
+  BEA: 'United Kingdom', BOR: 'Brazil',         BOT: 'Finland',
+  COL: 'Argentina',      GAS: 'France',         HAD: 'France',
+  HAM: 'United Kingdom', HUL: 'Germany',        LAW: 'New Zealand',
+  LEC: 'Monaco',         LIN: 'United Kingdom', NOR: 'United Kingdom',
+  OCO: 'France',         PER: 'Mexico',         PIA: 'Australia',
+  RUS: 'United Kingdom', SAI: 'Spain',          STR: 'Canada',
+  VER: 'Netherlands',
 };
 
-/* ── Deep merge (F1 sends partial patch objects) ── */
+const S = {
+  drivers:   {},
+  timing:    {},
+  appTiming: {},
+  session:   {},
+  track:     { Status: '1', Message: 'AllClear' },
+  lap:       {},
+  rcm:       [],
+};
+
 function merge(tgt, src) {
   if (src === null || typeof src !== 'object' || Array.isArray(src)) return src;
   const out = Object.assign({}, tgt);
@@ -372,8 +396,7 @@ function merge(tgt, src) {
   return out;
 }
 
-/* ── SignalR connection ── */
-let ws = null, keepAlive = null, reconnTimer = null, msgI = 1;
+let ws = null, keepAlive = null, reconnTimer = null;
 let hasData = false, noSessionTimer = null, msgCount = 0;
 
 async function connect() {
@@ -381,7 +404,6 @@ async function connect() {
   clearTimeout(reconnTimer);
   clearStatus();
   if (ws) { try { ws.close(); } catch(_) {} ws = null; }
-
   if (!hasData) setPreloaderText('Подключение…');
 
   try {
@@ -401,21 +423,16 @@ async function connect() {
       setPreloaderText('Ожидание данных сессии…');
       noSessionTimer = setTimeout(() => {
         if (!hasData) {
-          if (msgCount === 0) {
-            setPreloaderText('Нет данных от F1 · сессии нет или проблема с relay');
-          } else {
-            setPreloaderText(`Данные получены, но не распознаны · ${msgCount} сообщений`);
-          }
+          setPreloaderText(msgCount === 0
+            ? 'Нет данных от F1 · сессии нет или проблема с relay'
+            : `Данные получены, но не распознаны · ${msgCount} сообщений`);
         }
       }, 20000);
     }
     keepAlive = setInterval(() => ws.readyState === 1 && ws.send('{}'), 20000);
   };
 
-  ws.onmessage = e => {
-    msgCount++;
-    try { handleMsg(JSON.parse(e.data)); } catch(_) {}
-  };
+  ws.onmessage = e => { msgCount++; try { handleMsg(JSON.parse(e.data)); } catch(_) {} };
 
   ws.onclose = e => {
     clearInterval(keepAlive);
@@ -430,19 +447,13 @@ async function connect() {
 }
 
 function handleMsg(msg) {
-  if (msg.__dbg) {
-    if (!hasData) setPreloaderText(msg.__dbg);
-    return;
-  }
-  if (msg.R && typeof msg.R === 'object') {
+  if (msg.__dbg) { if (!hasData) setPreloaderText(msg.__dbg); return; }
+  if (msg.R && typeof msg.R === 'object')
     for (const [topic, data] of Object.entries(msg.R)) applyFeed(topic, data);
-  }
-  if (Array.isArray(msg.M)) {
-    for (const item of msg.M) {
+  if (Array.isArray(msg.M))
+    for (const item of msg.M)
       if (item.M === 'feed' && Array.isArray(item.A) && item.A.length >= 2)
         applyFeed(item.A[0], item.A[1]);
-    }
-  }
   if (msg.E) {
     showStatus('Ошибка SignalR · ' + msg.E);
     if (!hasData) setPreloaderText('Ошибка SignalR · ' + msg.E);
@@ -455,43 +466,27 @@ function applyFeed(topic, data) {
     case 'DriverList':
       S.drivers = merge(S.drivers, data);
       if (Object.keys(S.drivers).length) { hasData = true; clearTimeout(noSessionTimer); hidePreloader(); clearStatus(); }
-      renderTower();
-      break;
+      renderTower(); break;
     case 'TimingData':
       if (data.Lines) S.timing = merge(S.timing, data.Lines);
       if (Object.keys(S.timing).length) { hasData = true; clearTimeout(noSessionTimer); hidePreloader(); clearStatus(); }
-      renderTower();
-      break;
+      renderTower(); break;
     case 'TimingAppData':
       if (data.Lines) S.appTiming = merge(S.appTiming, data.Lines);
-      renderTower();
-      break;
-    case 'TrackStatus':
-      S.track = Object.assign({}, S.track, data);
-      renderHeader();
-      break;
-    case 'LapCount':
-      S.lap = Object.assign({}, S.lap, data);
-      renderHeader();
-      break;
-    case 'SessionInfo':
-      S.session = merge(S.session, data);
-      renderHeader();
-      break;
+      renderTower(); break;
+    case 'TrackStatus':  S.track = Object.assign({}, S.track, data); renderHeader(); break;
+    case 'LapCount':     S.lap   = Object.assign({}, S.lap,   data); renderHeader(); break;
+    case 'SessionInfo':  S.session = merge(S.session, data);         renderHeader(); break;
     case 'RaceControlMessages':
       if (data.Messages) {
-        const msgs = Object.values(data.Messages)
-          .sort((a,b) => (a.Utc > b.Utc ? -1 : 1));
+        const msgs = Object.values(data.Messages).sort((a,b) => (a.Utc > b.Utc ? -1 : 1));
         S.rcm = [...msgs, ...S.rcm].slice(0, 60);
         renderRCM();
       }
       break;
-    case 'ExtrapolatedClock':
-      break;
   }
 }
 
-/* ── Sector / lap time color ── */
 function timeClass(status) {
   const s = parseInt(status) || 0;
   if (s === 2064) return 'c-purple';
@@ -501,21 +496,6 @@ function timeClass(status) {
   return '';
 }
 
-/* ── Tyre ── */
-const CSHORT = { SOFT:'S', MEDIUM:'M', HARD:'H', INTERMEDIATE:'I', WET:'W' };
-
-function tyreHTML(num) {
-  const app = S.appTiming[num];
-  if (!app || !app.Stints) return '—';
-  const stints = Object.values(app.Stints);
-  if (!stints.length) return '—';
-  const last  = stints[stints.length - 1];
-  const c     = CSHORT[last.Compound] || '?';
-  const age   = last.TotalLaps != null ? last.TotalLaps : '';
-  return `<span class="tyre-lbl tyre-${c}">${c}</span><span class="tyre-age">${age}</span>`;
-}
-
-/* ── Render tower ── */
 function renderTower() {
   const tbody = document.getElementById('tbody');
   if (!tbody) return;
@@ -527,95 +507,110 @@ function renderTower() {
 
   let html = '';
   for (const { num, t, d } of rows) {
-    const retired  = !!t.Retired;
-    const inPit    = !!t.InPit;
-    const pitOut   = !!t.PitOut;
+    const retired = !!t.Retired;
+    const inPit   = !!t.InPit;
+    const pitOut  = !!t.PitOut;
+    const pos     = t.ShowPosition === false ? '' : (t.Line || '');
+    const tla     = d.Tla || num;
+    const country = DRIVER_COUNTRY[tla] || '';
 
-    const pos      = t.ShowPosition === false ? '' : (t.Line || '');
-    const teamCol  = d.TeamColour ? '#' + d.TeamColour : '#444';
-    const tla      = d.Tla || num;
+    /* Driver cell */
+    const logoSrc = `src/timing-icons/driver-logo/Property 1=${tla}.svg`;
+    const flagSrc = country ? `src/timing-icons/flags/Property 1=${country}.svg` : '';
+    const driverCell = `<div class="drv-cell">
+      <img class="drv-logo" src="${logoSrc}" alt="${tla}" onerror="this.style.display='none'">
+      <span class="drv-tla">${tla}</span>
+      ${flagSrc ? `<img class="drv-flag" src="${flagSrc}" alt="${country}" onerror="this.style.display='none'">` : ''}
+    </div>`;
 
-    let badge = '';
-    if (retired)    badge = '<span class="drv-badge stop">OUT</span>';
-    else if (inPit) badge = '<span class="drv-badge pit">PIT</span>';
-    else if (pitOut)badge = '<span class="drv-badge out">OUT</span>';
+    /* Status */
+    let statusHTML = '';
+    if (retired)    statusHTML = '<span class="status-badge status-dnf">DNF</span>';
+    else if (inPit) statusHTML = '<span class="status-badge status-pit">IN PIT</span>';
+    else if (pitOut)statusHTML = '<span class="status-badge status-out">PIT OUT</span>';
 
+    /* Tyre */
+    let tyreCell = '<span class="c-dim">—</span>';
+    const app = S.appTiming[num];
+    if (app && app.Stints) {
+      const stints = Object.values(app.Stints);
+      if (stints.length) {
+        const last     = stints[stints.length - 1];
+        const compound = (last.Compound || 'null').toLowerCase();
+        const age      = last.TotalLaps != null ? last.TotalLaps : '';
+        tyreCell = `<div class="tyre-wrap">
+          <img class="tyre-icon" src="src/timing-icons/tires/Property 1=${compound}.svg" alt="${compound}" onerror="this.style.display='none'">
+          <span class="tyre-age">${age}</span>
+        </div>`;
+      }
+    }
+
+    /* Gap / Interval */
     const isFirst = parseInt(t.Line) === 1;
     const gapVal  = isFirst ? '<span class="c-dim">—</span>' : (t.GapToLeader || '—');
-
     const intObj  = t.IntervalToPositionAhead || {};
     const intVal  = intObj.Value || '—';
     const intCls  = intObj.Catching ? 'catching' : '';
 
+    /* Sectors */
     const secs = t.Sectors || {};
     function secTD(i, colCls) {
-      const s = secs[String(i)] || {};
-      const v = s.Value || '';
-      return `<td class="${colCls} sec-cell ${v ? timeClass(s.Status) : 'c-dim'}">${v || '—'}</td>`;
+      const s   = secs[String(i)] || {};
+      const v   = s.Value || '';
+      const cls = v ? timeClass(s.Status) : '';
+      return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
+        <span class="sec-bar ${cls}"></span>
+        <span class="sec-val ${cls}">${v || '—'}</span>
+      </div></td>`;
     }
 
+    /* Lap times */
     const ll    = t.LastLapTime || {};
-    const llVal = ll.Value || '—';
     const llCls = ll.Value ? timeClass(ll.Status) : 'c-dim';
-
     const bl    = t.BestLapTime || {};
-    const blVal = bl.Value || '—';
 
     html += `<tr class="${retired ? 'row-retired' : ''}">
       <td class="pos-cell l">${pos}</td>
-      <td class="num-cell l">${num}</td>
-      <td class="l"><div class="drv-cell">
-        <span class="drv-bar" style="background:${teamCol}"></span>
-        <span class="drv-tla">${tla}</span>
-        ${badge}
-      </div></td>
+      <td class="l">${driverCell}</td>
+      <td class="status-col col-status">${statusHTML}</td>
+      <td class="tyre-cell col-tyre">${tyreCell}</td>
       <td class="gap-cell">${gapVal}</td>
       <td class="int-cell col-int ${intCls}">${intVal}</td>
       ${secTD(0,'col-s1')}${secTD(1,'col-s2')}${secTD(2,'col-s3')}
-      <td class="lap-cell ${llCls}">${llVal}</td>
-      <td class="best-cell col-best">${blVal}</td>
-      <td class="tyre-cell">${tyreHTML(num)}</td>
+      <td class="lap-cell ${llCls}">${ll.Value || '—'}</td>
+      <td class="best-cell col-best">${bl.Value || '—'}</td>
     </tr>`;
   }
 
   tbody.innerHTML = html;
 }
 
-/* ── Track status ── */
 const TRACK_MAP = {
-  '1': ['s-clear',  'CLEAR'],
-  '2': ['s-yellow', 'YELLOW'],
-  '3': ['s-yellow', 'YELLOW'],
-  '4': ['s-sc',     'SAFETY CAR'],
-  '5': ['s-red',    'RED FLAG'],
-  '6': ['s-vsc',    'VIRT SC'],
+  '1': ['s-clear',  'CLEAR'],      '2': ['s-yellow', 'YELLOW'],
+  '3': ['s-yellow', 'YELLOW'],     '4': ['s-sc',     'SAFETY CAR'],
+  '5': ['s-red',    'RED FLAG'],   '6': ['s-vsc',    'VIRT SC'],
   '7': ['s-vsc',    'VSC END'],
 };
 
 function renderHeader() {
-  const ev = document.getElementById('session-event');
-  const st = document.getElementById('session-type');
   const mtg = S.session.Meeting;
-  ev.textContent = (mtg && mtg.Name) ? mtg.Name : '—';
-  st.textContent = S.session.Name || '';
+  document.getElementById('session-event').textContent = (mtg && mtg.Name) ? mtg.Name : '—';
+  document.getElementById('session-type').textContent  = S.session.Name || '';
 
   const li = document.getElementById('lap-info');
-  if (S.lap.CurrentLap) {
+  if (S.lap.CurrentLap)
     li.textContent = S.lap.TotalLaps
       ? `Круг ${S.lap.CurrentLap} / ${S.lap.TotalLaps}`
       : `Круг ${S.lap.CurrentLap}`;
-  }
 
   const tb = document.getElementById('track-badge');
   const [cls, label] = TRACK_MAP[S.track.Status] || ['s-clear', S.track.Message || 'CLEAR'];
-  tb.className = cls;
+  tb.className  = cls;
   tb.textContent = label;
 }
 
-/* ── Race Control ── */
 function renderRCM() {
-  const list = document.getElementById('rcm-list');
-  list.innerHTML = S.rcm.slice(0, 15).map(m => {
+  document.getElementById('rcm-list').innerHTML = S.rcm.slice(0, 15).map(m => {
     const ts   = (m.Utc || '').slice(11, 16);
     const flag = m.Flag ? `flag-${m.Flag}` : '';
     return `<div class="rcm-row ${flag}">
@@ -625,26 +620,12 @@ function renderRCM() {
   }).join('');
 }
 
-/* ── UI helpers ── */
-function setDot(cls) {
-  document.getElementById('conn-dot').className = cls;
-}
-function setPreloaderText(sub) {
-  document.getElementById('pl-sub').textContent = sub;
-}
-function hidePreloader() {
-  document.getElementById('preloader').classList.add('hidden');
-}
-function showStatus(msg) {
-  const bar = document.getElementById('status-bar');
-  bar.textContent = msg;
-  bar.classList.remove('hidden');
-}
-function clearStatus() {
-  document.getElementById('status-bar').classList.add('hidden');
-}
+function setDot(cls)           { document.getElementById('conn-dot').className = cls; }
+function setPreloaderText(sub) { document.getElementById('pl-sub').textContent = sub; }
+function hidePreloader()       { document.getElementById('preloader').classList.add('hidden'); }
+function showStatus(msg)       { const b = document.getElementById('status-bar'); b.textContent = msg; b.classList.remove('hidden'); }
+function clearStatus()         { document.getElementById('status-bar').classList.add('hidden'); }
 
-/* ── RCM collapse toggle ── */
 document.getElementById('rcm-head').addEventListener('click', () => {
   const wrap = document.getElementById('rcm-wrap');
   const tog  = document.getElementById('rcm-toggle');
