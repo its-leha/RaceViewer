@@ -102,8 +102,6 @@
       overflow-y: auto;
       overflow-x: hidden;
       min-height: 0;
-      padding: 0 8px;
-      background: #0f0f0f;
     }
     table {
       width: 100%;
@@ -141,6 +139,9 @@
       font-size: 11px;
     }
     td.l { text-align: left; }
+
+    thead th:first-child, tbody td:first-child { padding-left: 8px; }
+    thead th:last-child,  tbody td:last-child  { padding-right: 8px; }
 
     /* Position */
     .pos-cell { color: var(--dim); width: 22px; text-align: center; }
