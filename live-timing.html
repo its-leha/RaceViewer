@@ -641,15 +641,19 @@ function timeClass(status) {
 function getQualInfo() {
   const name  = S.session.Name || '';
   const lower = name.toLowerCase();
-  if (!lower.includes('qualifying')) return null;
-  const sprint = lower.includes('sprint');
-  if (lower.includes('1')) return { cutoff: 16, label: sprint ? 'SQ1' : 'Q1' };
-  if (lower.includes('2')) return { cutoff: 11, label: sprint ? 'SQ2' : 'Q2' };
-  if (lower.includes('3')) return { cutoff: 11, label: sprint ? 'SQ3' : 'Q3' };
-  const total = Object.keys(S.timing).length;
-  if (total > 15) return { cutoff: 16, label: 'Q1' };
-  if (total > 10) return { cutoff: 11, label: 'Q2' };
-  return { cutoff: 11, label: 'Q3' };
+  const isQual = lower.includes('qualifying') || /^s?q\d?$/i.test(name);
+  if (!isQual) return null;
+  const sprint = lower.includes('sprint') || /^sq/i.test(name);
+
+  // Use non-KnockedOut driver count to detect current segment
+  const entries = Object.values(S.timing);
+  const total   = entries.length;
+  if (!total) return null;
+  const active  = entries.filter(t => !t.KnockedOut).length || total;
+
+  if (active > 15) return { cutoff: 16, label: sprint ? 'SQ1' : 'Q1' };
+  if (active > 10) return { cutoff: 11, label: sprint ? 'SQ2' : 'Q2' };
+  return             { cutoff: 11, label: sprint ? 'SQ3' : 'Q3' };
 }
 
 function renderTower() {
@@ -787,15 +791,16 @@ const TRACK_MAP = {
 function renderHeader() {
   const mtg = S.session.Meeting;
   document.getElementById('session-event').textContent = (mtg && mtg.Name) ? mtg.Name : '—';
-  document.getElementById('session-type').textContent  = S.session.Name || '';
+
+  const qi = getQualInfo();
+  document.getElementById('session-type').textContent = qi ? qi.label : (S.session.Name || '');
 
   const li = document.getElementById('lap-info');
-  const isRace = !(S.session.Name || '').toLowerCase().includes('qualifying');
-  if (isRace && S.lap.CurrentLap)
+  if (!qi && S.lap.CurrentLap)
     li.textContent = S.lap.TotalLaps
       ? `Круг ${S.lap.CurrentLap} / ${S.lap.TotalLaps}`
       : `Круг ${S.lap.CurrentLap}`;
-  else if (!isRace)
+  else if (qi)
     li.textContent = '';
 
   const tb = document.getElementById('track-badge');
