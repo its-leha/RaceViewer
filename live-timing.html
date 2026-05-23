@@ -660,7 +660,7 @@ function renderTower() {
     const intObj   = t.IntervalToPositionAhead || {};
     const intVal   = intObj.Value || '—';
     const intFloat = parseFloat(intVal);
-    let catching   = !!intObj.Catching;
+    let catching = (t._c && 'catching' in t._c) ? t._c.catching : !!intObj.Catching;
     if (!catching && !isNaN(intFloat)) {
       const prev = intCache[num];
       if (prev != null && intFloat < prev) catching = true;
@@ -674,7 +674,8 @@ function renderTower() {
       const s    = secs[String(i)] || {};
       const v    = s.Value || '';
       const prev = s.PreviousValue || '';
-      const cls  = v ? timeClass(s.Status) : '';
+      const status = (t._c && t._c['s' + i] != null) ? t._c['s' + i] : s.Status;
+      const cls  = v ? timeClass(status) : '';
       return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
         <span class="sec-bar ${cls}"></span>
         <div class="sec-times">
@@ -686,7 +687,8 @@ function renderTower() {
 
     /* Lap times */
     const ll    = t.LastLapTime || {};
-    const llCls = ll.Value ? timeClass(ll.Status) : 'c-dim';
+    const llStatus = (t._c && t._c.lap != null) ? t._c.lap : ll.Status;
+    const llCls = ll.Value ? timeClass(llStatus) : 'c-dim';
     const bl    = t.BestLapTime || {};
 
     /* Elimination zone divider */
