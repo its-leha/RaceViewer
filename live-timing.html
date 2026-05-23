@@ -478,9 +478,11 @@ const S = {
   lap:       {},
   rcm:       [],
 };
-const tyreCache = {}; // num → last known non-null Compound
-const intCache  = {}; // num → previous interval float (for catching detection)
-let clockData   = null; // { remaining: secs, utcMs: ms, extrapolating: bool }
+const tyreCache   = {}; // num → last known non-null Compound
+const intCache    = {}; // num → previous interval float (for catching detection)
+const sectorCache = {}; // num → { 0: lastVal, 1: lastVal, 2: lastVal }
+let clockData     = null; // { remaining: secs, utcMs: ms, extrapolating: bool }
+let lastClientKey = null;
 
 function merge(tgt, src) {
   if (src === null || typeof src !== 'object' || Array.isArray(src)) return src;
@@ -606,7 +608,15 @@ function applyFeed(topic, data) {
       renderTower(); break;
     case 'TrackStatus':  S.track = Object.assign({}, S.track, data); renderHeader(); break;
     case 'LapCount':     S.lap   = Object.assign({}, S.lap,   data); renderHeader(); break;
-    case 'SessionInfo':  S.session = merge(S.session, data);         renderHeader(); break;
+    case 'SessionInfo':
+      S.session = merge(S.session, data);
+      { const k = (S.session.Key||'')+'|'+(S.session.Name||'');
+        if (k !== '|' && k !== lastClientKey) {
+          lastClientKey = k;
+          for (const n of Object.keys(sectorCache)) delete sectorCache[n];
+        }
+      }
+      renderHeader(); break;
     case 'ExtrapolatedClock': {
       const rem = parseRemaining(data.Remaining);
       if (rem != null) {
@@ -727,13 +737,17 @@ function renderTower() {
     /* Sectors */
     const secs = t.Sectors || {};
     function secTD(i, colCls) {
-      const s    = secs[String(i)] || {};
-      const v    = s.Value || '';
-      const prev = (s.PreviousValue && s.PreviousValue !== v) ? s.PreviousValue : '';
+      if (!sectorCache[num]) sectorCache[num] = {};
+      const s      = secs[String(i)] || {};
+      const rawV   = s.Value || '';
+      if (rawV) sectorCache[num][i] = rawV;
+      const cached = !rawV && !!sectorCache[num][i];
+      const v      = rawV || sectorCache[num][i] || '';
+      const prev   = (!cached && s.PreviousValue && s.PreviousValue !== rawV) ? s.PreviousValue : '';
       const status = (t._c && t._c['s' + i] != null) ? t._c['s' + i] : s.Status;
-      const cls  = v ? timeClass(status) : '';
+      const cls    = rawV ? timeClass(status) : (cached ? 'c-dim' : '');
       return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
-        <span class="sec-bar ${cls}"></span>
+        <span class="sec-bar ${rawV ? cls : ''}"></span>
         <div class="sec-times">
           <span class="sec-mini">${prev}</span>
           <span class="sec-val ${cls}">${v || '—'}</span>
