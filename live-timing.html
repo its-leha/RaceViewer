@@ -738,12 +738,20 @@ function renderTower() {
     const secs = t.Sectors || {};
     function secTD(i, colCls) {
       if (!sectorCache[num]) sectorCache[num] = {};
-      const s      = secs[String(i)] || {};
-      const rawV   = s.Value || '';
-      if (rawV) sectorCache[num][i] = rawV;
-      const cached = !rawV && !!sectorCache[num][i];
-      const v      = rawV || sectorCache[num][i] || '';
-      const prev   = (!cached && s.PreviousValue && s.PreviousValue !== rawV) ? s.PreviousValue : '';
+      const s    = secs[String(i)] || {};
+      const rawV = s.Value || '';
+      if (rawV) {
+        sectorCache[num][i] = {
+          v:    rawV,
+          prev: (s.PreviousValue && s.PreviousValue !== rawV) ? s.PreviousValue : null,
+        };
+      }
+      const entry  = sectorCache[num][i] || {};
+      const v      = rawV || entry.v || '';
+      const cached = !rawV && !!entry.v;
+      const livePrev = s.PreviousValue && s.PreviousValue !== rawV && s.PreviousValue !== v
+        ? s.PreviousValue : null;
+      const prev = livePrev || (entry.prev && entry.prev !== v ? entry.prev : '');
       const status = (t._c && t._c['s' + i] != null) ? t._c['s' + i] : s.Status;
       const cls    = rawV ? timeClass(status) : (cached ? 'c-dim' : '');
       return `<td class="sec-cell ${colCls}"><div class="sec-wrap">
