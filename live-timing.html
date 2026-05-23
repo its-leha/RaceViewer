@@ -550,11 +550,11 @@ function getQualInfo() {
   const sprint = lower.includes('sprint');
   if (lower.includes('1')) return { cutoff: 16, label: sprint ? 'SQ1' : 'Q1' };
   if (lower.includes('2')) return { cutoff: 11, label: sprint ? 'SQ2' : 'Q2' };
-  if (lower.includes('3')) return { cutoff: null, label: sprint ? 'SQ3' : 'Q3' };
+  if (lower.includes('3')) return { cutoff: 11, label: sprint ? 'SQ3' : 'Q3' };
   const total = Object.keys(S.timing).length;
   if (total > 15) return { cutoff: 16, label: 'Q1' };
   if (total > 10) return { cutoff: 11, label: 'Q2' };
-  return { cutoff: null, label: 'Q3' };
+  return { cutoff: 11, label: 'Q3' };
 }
 
 function renderTower() {
