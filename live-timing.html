@@ -836,6 +836,14 @@ document.getElementById('rcm-translate-btn').addEventListener('click', e => {
 });
 
 connect();
+
+// Debug helper: _f1d(racing_number) e.g. _f1d(1) or _f1d(44)
+window._f1d = (num) => {
+  const k = String(num || Object.keys(S.timing)[0]);
+  console.log(`[F1 debug] driver ${k}`);
+  console.log('timing:   ', JSON.parse(JSON.stringify(S.timing[k] || {})));
+  console.log('appTiming:', JSON.parse(JSON.stringify(S.appTiming[k] || {})));
+};
 </script>
 </body>
 </html>
