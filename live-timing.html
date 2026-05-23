@@ -651,7 +651,7 @@ function getQualInfo() {
   if (!total) return null;
   const active  = entries.filter(t => !t.KnockedOut).length || total;
 
-  if (active > 15) return { cutoff: 16, label: sprint ? 'SQ1' : 'Q1' };
+  if (active > 16) return { cutoff: 17, label: sprint ? 'SQ1' : 'Q1' };
   if (active > 10) return { cutoff: 11, label: sprint ? 'SQ2' : 'Q2' };
   return             { cutoff: 11, label: sprint ? 'SQ3' : 'Q3' };
 }
