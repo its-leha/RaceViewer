@@ -539,7 +539,7 @@ async function connect() {
   if (!hasData) setPreloaderText('Подключение…');
 
   try {
-    ws = new WebSocket('wss://updating-ambien-reprint-each.trycloudflare.com');
+    ws = new WebSocket('wss://grain-plains-authentication-aged.trycloudflare.com');
   } catch(e) {
     setDot('error');
     if (!hasData) setPreloaderText('Ошибка: ' + e.message);
