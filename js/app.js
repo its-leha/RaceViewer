@@ -201,7 +201,7 @@ function renderSuggestions(el, id) {
 const TELEMETRY_MARKER   = '__telemetry__';
 const LIVETIMING_MARKER  = '__livetiming__';
 const RACEPULSE_URL      = 'https://its-leha.github.io/RacePulse';
-const LIVETIMING_URL     = 'live-timing.html';
+const LIVETIMING_URL     = 'https://its-leha.github.io/F1Tower';
 
 function makePanel(id) {
     const el = document.createElement('div');
